@@ -1,14 +1,7 @@
 fileFormatVersion: 2
-guid: ba3eb6b685c0e0c4ba30d08ec22c45be
+guid: f58278f49cd463a44b5965110fb48a59
 PrefabImporter:
   externalObjects: {}
   userData: 
   assetBundleName: 
   assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 284167
-  packageName: POLY STYLE - Platformer Starter Pack
-  packageVersion: 1.2
-  assetPath: Assets/POLY STYLE - Platformer Starter Pack/Platformer Starter Pack_URP/Prefabs/Environments/Tree_3.prefab
-  uploadId: 661738

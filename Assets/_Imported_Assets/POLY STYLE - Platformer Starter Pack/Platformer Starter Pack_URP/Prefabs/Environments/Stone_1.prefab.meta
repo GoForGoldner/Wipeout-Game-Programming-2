@@ -1,14 +1,7 @@
 fileFormatVersion: 2
-guid: b0035cc3b5e6130448e28efdaf06b319
+guid: 6bf5ae5f74e831442a9df1be995cc76f
 PrefabImporter:
   externalObjects: {}
   userData: 
   assetBundleName: 
   assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 284167
-  packageName: POLY STYLE - Platformer Starter Pack
-  packageVersion: 1.2
-  assetPath: Assets/POLY STYLE - Platformer Starter Pack/Platformer Starter Pack_URP/Prefabs/Environments/Stone_1.prefab
-  uploadId: 661738

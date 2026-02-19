@@ -1,15 +1,8 @@
 fileFormatVersion: 2
-guid: 130ece05034e8344992e207b56a66bae
+guid: f5eaded9aecca234d99b3cf8b7313ae7
 NativeFormatImporter:
   externalObjects: {}
   mainObjectFileID: 2100000
   userData: 
   assetBundleName: 
   assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 284167
-  packageName: POLY STYLE - Platformer Starter Pack
-  packageVersion: 1.2
-  assetPath: Assets/POLY STYLE - Platformer Starter Pack/Platformer Starter Pack_URP/Art/Materials/Environments/Terrain-1.mat
-  uploadId: 661738

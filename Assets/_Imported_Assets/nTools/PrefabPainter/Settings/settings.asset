@@ -18,7 +18,7 @@ MonoBehaviour:
     - name: tree random
       settings:
         brushRadius: 5.9484143
-        brushSpacing: 0.884
+        brushSpacing: 1.668
         brushOverlapCheckMode: 0
         brushOverlapDistance: 5
         brushOverlapCheckObjects: 1
@@ -35,8 +35,8 @@ MonoBehaviour:
         randomizeOrientationZ: 5
         scaleTransformMode: 0
         scaleMode: 0
-        scaleUniformMin: 1.8
-        scaleUniformMax: 2.3
+        scaleUniformMin: 2.6
+        scaleUniformMax: 4
         scalePerAxisMin: {x: 1, y: 1, z: 1}
         scalePerAxisMax: {x: 1, y: 1, z: 1}
         pinFixedRotation: 0
@@ -156,8 +156,8 @@ MonoBehaviour:
       customPreviewImage: {fileID: 0}
     - name: grass random
       settings:
-        brushRadius: 4.99
-        brushSpacing: 0.042
+        brushRadius: 5.07
+        brushSpacing: 0.05
         brushOverlapCheckMode: 0
         brushOverlapDistance: 5
         brushOverlapCheckObjects: 1
@@ -2463,7 +2463,7 @@ MonoBehaviour:
   ignoreLayers:
     serializedVersion: 2
     m_Bits: 32
-  placeUnder: 2
+  placeUnder: 0
   overwritePrefabLayer: 1
   prefabPlaceLayer: 5
   pinSnapRotationValue: 15

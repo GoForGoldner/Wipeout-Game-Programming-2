@@ -39,8 +39,8 @@ Material:
     m_Ints: []
     m_Floats:
     - _Intensity: 1
-    - _LabSteps: 10.65
-    - _PaletteCount: 568
+    - _LabSteps: 7.19
+    - _PaletteCount: 127
     - _PixelSize: 2
     - _UsePalette: 1
     m_Colors:

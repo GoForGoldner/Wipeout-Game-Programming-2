@@ -25,6 +25,7 @@ Shader "Nicrom/LPW/URP/Low Poly Vegetation"
         _MBWindDirOffset    ("MB Wind Dir Offset",  Range(0,180))   = 20
         [Space]
         _MBMaxHeight        ("MB Max Height",       Float)          = 10
+        _WindMaxDistance    ("Wind Max Distance",   Float)          = 50
 
         [NoScaleOffset][Header(World Space Noise)][Space]
         _NoiseTexture       ("Noise Texture",       2D)             = "bump" {}
@@ -56,7 +57,6 @@ Shader "Nicrom/LPW/URP/Low Poly Vegetation"
             #pragma vertex   VegetationVert
             #pragma fragment VegetationFrag
 
-            // URP lighting keywords
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE
             #pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
             #pragma multi_compile_fragment _ _SHADOWS_SOFT
@@ -66,15 +66,9 @@ Shader "Nicrom/LPW/URP/Low Poly Vegetation"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
 
-            // ----------------------------------------------------------------
-            // Textures
-            // ----------------------------------------------------------------
             TEXTURE2D(_MainTex);    SAMPLER(sampler_MainTex);
             TEXTURE2D(_NoiseTexture); SAMPLER(sampler_NoiseTexture);
 
-            // ----------------------------------------------------------------
-            // Constant buffer
-            // ----------------------------------------------------------------
             CBUFFER_START(UnityPerMaterial)
                 float4  _Color;
                 float   _Metallic;
@@ -89,14 +83,12 @@ Shader "Nicrom/LPW/URP/Low Poly Vegetation"
                 float   _MBWindDir;
                 float   _MBWindDirOffset;
                 float   _MBMaxHeight;
+                float   _WindMaxDistance;
 
                 float4  _NoiseTextureTilling;
                 float2  _NoisePannerSpeed;
             CBUFFER_END
 
-            // ----------------------------------------------------------------
-            // Structs
-            // ----------------------------------------------------------------
             struct Attributes
             {
                 float4 positionOS   : POSITION;
@@ -119,9 +111,6 @@ Shader "Nicrom/LPW/URP/Low Poly Vegetation"
                 UNITY_VERTEX_OUTPUT_STEREO
             };
 
-            // ----------------------------------------------------------------
-            // Rotate around axis helper
-            // ----------------------------------------------------------------
             float3 RotateAroundAxis(float3 center, float3 original, float3 u, float angle)
             {
                 original -= center;
@@ -134,9 +123,6 @@ Shader "Nicrom/LPW/URP/Low Poly Vegetation"
                 return mul(m, original) + center;
             }
 
-            // ----------------------------------------------------------------
-            // Vertex
-            // ----------------------------------------------------------------
             Varyings VegetationVert(Attributes IN)
             {
                 UNITY_SETUP_INSTANCE_ID(IN);
@@ -147,24 +133,21 @@ Shader "Nicrom/LPW/URP/Low Poly Vegetation"
                 float3 posOS = IN.positionOS.xyz;
 
                 // ---- Wind bending ----
-                float3 objOriginWS = TransformObjectToWorld(float3(0,0,0));
+                // Use matrix translation column directly - instance-safe
+                float3 objOriginWS = float3(UNITY_MATRIX_M[0][3], UNITY_MATRIX_M[1][3], UNITY_MATRIX_M[2][3]);
                 float2 wsUV        = objOriginWS.xz;
 
-                // Animated noise
                 float2 animTiling  = _NoiseTextureTilling.zw;
                 float2 panner      = 0.1 * _Time.y * _NoisePannerSpeed;
                 float  animNoise   = SAMPLE_TEXTURE2D_LOD(_NoiseTexture, sampler_NoiseTexture,
                                         wsUV * animTiling + panner, 0).r;
 
-                // Wind direction axis
                 float windDirRad   = radians((_MBWindDir +
                     _MBWindDirOffset * (-1.0 + animNoise * 2.0)) * -1.0);
                 float3 windDirWS   = float3(cos(windDirRad), 0.0, sin(windDirRad));
-                // Transform to object space for rotation axis
                 float3 windDirOS   = normalize(
                     TransformWorldToObject(windDirWS) - TransformWorldToObject(float3(0,0,0)));
 
-                // Static noise for amplitude/frequency variation
                 float2 staticTiling = _NoiseTextureTilling.xy;
                 float  staticNoise  = SAMPLE_TEXTURE2D_LOD(_NoiseTexture, sampler_NoiseTexture,
                                         wsUV * staticTiling, 0).r;
@@ -174,15 +157,17 @@ Shader "Nicrom/LPW/URP/Low Poly Vegetation"
                 float sineInput = ((objOriginWS.x + objOriginWS.z)
                                   + (_Time.y * freq)) * _MBPhase;
 
-                float angle = radians((amp * sin(sineInput) + _MBDefaultBending)
-                              * (posOS.y / max(_MBMaxHeight, 0.001)));
+                float distToCamera = length(_WorldSpaceCameraPos - objOriginWS);
+                float windFalloff  = 1.0 - saturate(distToCamera / max(_WindMaxDistance, 0.001));
 
-                // Only bend above ground
+                float angle = radians((amp * sin(sineInput) + _MBDefaultBending)
+                              * (posOS.y / max(_MBMaxHeight, 0.001))) * windFalloff;
+
                 float mask = step(0.01, posOS.y);
 
-                float3 pivot      = float3(0.0, posOS.y, 0.0);
-                float3 rotated1   = RotateAroundAxis(pivot,    posOS,    windDirOS, angle);
-                float3 rotated2   = RotateAroundAxis(float3(0,0,0), rotated1, windDirOS, angle);
+                float3 pivot    = float3(0.0, posOS.y, 0.0);
+                float3 rotated1 = RotateAroundAxis(pivot, posOS, windDirOS, angle);
+                float3 rotated2 = RotateAroundAxis(float3(0,0,0), rotated1, windDirOS, angle);
                 posOS += (rotated2 - posOS) * mask;
 
                 // ---- Output ----
@@ -201,9 +186,6 @@ Shader "Nicrom/LPW/URP/Low Poly Vegetation"
                 return OUT;
             }
 
-            // ----------------------------------------------------------------
-            // Fragment
-            // ----------------------------------------------------------------
             half4 VegetationFrag(Varyings IN) : SV_Target
             {
                 UNITY_SETUP_INSTANCE_ID(IN);
@@ -214,7 +196,6 @@ Shader "Nicrom/LPW/URP/Low Poly Vegetation"
 
                 float3 normalWS  = normalize(IN.normalWS);
 
-                // URP PBR lighting
                 InputData lightingInput = (InputData)0;
                 lightingInput.positionWS        = IN.positionWS;
                 lightingInput.normalWS          = normalWS;
@@ -261,6 +242,7 @@ Shader "Nicrom/LPW/URP/Low Poly Vegetation"
                 float  _MBDefaultBending; float _MBAmplitude; float _MBAmplitudeOffset;
                 float  _MBFrequency; float _MBFrequencyOffset; float _MBPhase;
                 float  _MBWindDir; float _MBWindDirOffset; float _MBMaxHeight;
+                float  _WindMaxDistance;
                 float4 _NoiseTextureTilling;
                 float2 _NoisePannerSpeed;
             CBUFFER_END
@@ -282,7 +264,8 @@ Shader "Nicrom/LPW/URP/Low Poly Vegetation"
             Varyings ShadowVert(Attributes IN)
             {
                 float3 posOS = IN.positionOS.xyz;
-                float3 objOriginWS = TransformObjectToWorld(float3(0,0,0));
+                // Use matrix translation column directly - instance-safe
+                float3 objOriginWS = float3(UNITY_MATRIX_M[0][3], UNITY_MATRIX_M[1][3], UNITY_MATRIX_M[2][3]);
                 float2 wsUV = objOriginWS.xz;
 
                 float2 animTiling = _NoiseTextureTilling.zw;
@@ -303,13 +286,17 @@ Shader "Nicrom/LPW/URP/Low Poly Vegetation"
                 float amp  = _MBAmplitude + _MBAmplitudeOffset * staticNoise;
                 float freq = _MBFrequency + _MBFrequencyOffset * staticNoise;
                 float sineInput = ((objOriginWS.x + objOriginWS.z) + (_Time.y * freq)) * _MBPhase;
+
+                float distToCamera = length(_WorldSpaceCameraPos - objOriginWS);
+                float windFalloff  = 1.0 - saturate(distToCamera / max(_WindMaxDistance, 0.001));
+
                 float angle = radians((amp * sin(sineInput) + _MBDefaultBending)
-                              * (posOS.y / max(_MBMaxHeight, 0.001)));
+                              * (posOS.y / max(_MBMaxHeight, 0.001))) * windFalloff;
                 float mask = step(0.01, posOS.y);
 
-                float3 pivot    = float3(0.0, posOS.y, 0.0);
-                float3 rot1     = RotateAroundAxis(pivot, posOS, windDirOS, angle);
-                float3 rot2     = RotateAroundAxis(float3(0,0,0), rot1, windDirOS, angle);
+                float3 pivot = float3(0.0, posOS.y, 0.0);
+                float3 rot1  = RotateAroundAxis(pivot, posOS, windDirOS, angle);
+                float3 rot2  = RotateAroundAxis(float3(0,0,0), rot1, windDirOS, angle);
                 posOS += (rot2 - posOS) * mask;
 
                 Varyings OUT;
@@ -323,7 +310,7 @@ Shader "Nicrom/LPW/URP/Low Poly Vegetation"
             ENDHLSL
         }
 
-        // Depth-only pass (for depth prepass / SSAO etc.)
+        // Depth-only pass
         Pass
         {
             Name "DepthOnly"
@@ -342,6 +329,7 @@ Shader "Nicrom/LPW/URP/Low Poly Vegetation"
                 float _MBDefaultBending; float _MBAmplitude; float _MBAmplitudeOffset;
                 float _MBFrequency; float _MBFrequencyOffset; float _MBPhase;
                 float _MBWindDir; float _MBWindDirOffset; float _MBMaxHeight;
+                float _WindMaxDistance;
                 float4 _NoiseTextureTilling; float2 _NoisePannerSpeed;
             CBUFFER_END
 

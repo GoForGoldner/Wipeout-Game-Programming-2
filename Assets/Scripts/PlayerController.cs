@@ -48,6 +48,11 @@ public class PlayerController : MonoBehaviour
     public bool gravityFlipEnabled = true;
     public float flipRotateSpeed = 720f;
 
+    [Header("Audio")]
+    public AudioSource audioSource;
+    public AudioClip jumpClip;
+    [Range(0f, 1f)] public float jumpVolume = 1f;
+
     // Gravity-up vectors per step (step 0 = normal, 1 = right wall, 2 = ceiling, 3 = left wall)
     static readonly Vector3[] GravityUp =
     {
@@ -156,6 +161,7 @@ public class PlayerController : MonoBehaviour
                 hasJumped = true;
                 isDiving = false;
                 PlayAnim(animJump, 0f);
+                PlayJumpSound();
             }
             else if (hasJumped && !isDiving)
             {
@@ -178,6 +184,7 @@ public class PlayerController : MonoBehaviour
             lastJumpPressedTime = -999f;
             lastGroundedTime = -999f;
             hasJumped = true;
+            PlayJumpSound();
         }
     }
 
@@ -251,6 +258,25 @@ public class PlayerController : MonoBehaviour
         if (anim == currentAnim) return;
         currentAnim = anim;
         animator.CrossFadeInFixedTime(anim, crossFade);
+    }
+
+    void PlayJumpSound()
+    {
+        Debug.Log("PlayJumpSound called");
+
+        if (audioSource == null)
+        {
+            Debug.LogWarning("AudioSource is NULL");
+            return;
+        }
+
+        if (jumpClip == null)
+        {
+            Debug.LogWarning("jumpClip is NULL");
+            return;
+        }
+
+        audioSource.PlayOneShot(jumpClip, jumpVolume);
     }
 
     void UpdateAnimation(Vector2 moveValue, Vector3 currentWorldMove)

@@ -192,6 +192,8 @@ public class PlayerController : MonoBehaviour
 
     void Move()
     {
+        if (cc == null || !cc.enabled) return;
+
         Vector2 moveValue = moveActionRef != null
             ? moveActionRef.action.ReadValue<Vector2>()
             : Vector2.zero;
@@ -262,17 +264,17 @@ public class PlayerController : MonoBehaviour
 
     void PlayJumpSound()
     {
-        Debug.Log("PlayJumpSound called");
+        //Debug.Log("PlayJumpSound called");
 
         if (audioSource == null)
         {
-            Debug.LogWarning("AudioSource is NULL");
+            //Debug.LogWarning("AudioSource is NULL");
             return;
         }
 
         if (jumpClip == null)
         {
-            Debug.LogWarning("jumpClip is NULL");
+            //Debug.LogWarning("jumpClip is NULL");
             return;
         }
 

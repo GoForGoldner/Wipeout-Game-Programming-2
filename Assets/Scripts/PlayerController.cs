@@ -53,6 +53,9 @@ public class PlayerController : MonoBehaviour
     public AudioClip jumpClip;
     [Range(0f, 1f)] public float jumpVolume = 1f;
 
+    // currently theres a but where when a player moves, the other player starts playing the move animation so i'll be clonning the inputacion for now (FP2)
+    InputAction moveAction;
+
     // Gravity-up vectors per step (step 0 = normal, 1 = right wall, 2 = ceiling, 3 = left wall)
     static readonly Vector3[] GravityUp =
     {
@@ -82,6 +85,8 @@ public class PlayerController : MonoBehaviour
 
     void Awake()
     {
+        moveAction = moveActionRef.action.Clone();
+        moveAction.Enable();
         cc = GetComponent<CharacterController>();
         gravityTargetRot = transform.rotation;
         LockCursor();

@@ -189,14 +189,40 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SimpleWipeoutController
   moveActionRef: {fileID: 0}
   jumpActionRef: {fileID: 0}
-  cameraTransform: {fileID: 0}
+  rotateLeftActionRef: {fileID: 0}
+  rotateRightActionRef: {fileID: 0}
+  cameraPivot: {fileID: 0}
   moveSpeed: 6.5
   acceleration: 18
+  deceleration: 25
   rotationSpeed: 14
   jumpHeight: 1.6
   gravity: -22
   coyoteTime: 0.1
   jumpBuffer: 0.1
+  fallMultiplier: 2
+  diveForwardSpeed: 10
+  diveDownSpeed: -4
+  animator: {fileID: 0}
+  animIdle: Idle
+  animRunFwd: RunFWD
+  animRunBwd: RunBWD
+  animRunLeft: RunLeft
+  animRunRight: RunRight
+  animDive: Slide
+  animJump: Jump
+  animFall: Jump
+  collisionMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  gravityFlipEnabled: 1
+  flipRotateSpeed: 720
+  audioSource: {fileID: 0}
+  jumpClip: {fileID: 0}
+  jumpVolume: 1
+  isGrounded: 0
+  wasGrounded: 0
+  gravityStepIndex: 0
 --- !u!54 &7556290834230506793
 Rigidbody:
   m_ObjectHideFlags: 0

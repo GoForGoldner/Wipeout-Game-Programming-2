@@ -53,6 +53,11 @@ public class PlayerController : MonoBehaviour
     public AudioClip jumpClip;
     [Range(0f, 1f)] public float jumpVolume = 1f;
 
+    [Header("Anti Gravity")]
+    public float antiGravityJumpHeight = 3.0f;
+    public float antiGravityGravity = -12f;
+    public float antiGravityFallMultiplier = 1.0f;
+
     // currently theres a but where when a player moves, the other player starts playing the move animation so i'll be clonning the inputacion for now (FP2)
     InputAction moveAction;
 
@@ -71,6 +76,10 @@ public class PlayerController : MonoBehaviour
     Vector3 worldDiveDir;
     float lastGroundedTime = -999f;
     float lastJumpPressedTime = -999f;
+    float normalJumpHeight;
+    float normalGravity;
+    float normalFallMultiplier;
+    bool antiGravityActive;
 
     string currentAnim;
     [HideInInspector] public bool isGrounded;
@@ -85,10 +94,13 @@ public class PlayerController : MonoBehaviour
 
     void Awake()
     {
-        moveAction = moveActionRef.action.Clone();
-        moveAction.Enable();
         cc = GetComponent<CharacterController>();
         gravityTargetRot = transform.rotation;
+
+        normalJumpHeight = jumpHeight;
+        normalGravity = gravity;
+        normalFallMultiplier = fallMultiplier;
+
         LockCursor();
     }
 
@@ -358,6 +370,23 @@ public class PlayerController : MonoBehaviour
 
     // ── Public API ────────────────────────────────────────────────────────────
 
+    public void SetAntiGravity(bool enabled)
+    {
+        antiGravityActive = enabled;
+
+        if (enabled)
+        {
+            jumpHeight = antiGravityJumpHeight;
+            gravity = antiGravityGravity;
+            fallMultiplier = antiGravityFallMultiplier;
+        }
+        else
+        {
+            jumpHeight = normalJumpHeight;
+            gravity = normalGravity;
+            fallMultiplier = normalFallMultiplier;
+        }
+    }
     public void SetGravityFlipEnabled(bool enabled) => gravityFlipEnabled = enabled;
 
     public void ResetGravityOrientation()

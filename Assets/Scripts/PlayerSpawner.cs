@@ -1,31 +1,49 @@
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerSpawner : MonoBehaviour
 {
+    public static PlayerSpawner Instance { get; private set; }
+
+    public string gameplaySceneName = "GameScene";
     public string spawnPointParentTag = "SpawnPoint";
 
     NetworkManager nm;
 
-    GameObject playerPrefab;
+    void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+    }
+
     void Start()
     {
         nm = NetworkManager.Singleton;
         if (nm == null) return;
 
-        playerPrefab = nm.NetworkConfig.PlayerPrefab;  // save it
-        nm.NetworkConfig.PlayerPrefab = null;           // prevent auto-spawn
-        nm.NetworkConfig.ConnectionApproval = true;
         nm.ConnectionApprovalCallback += Approval;
-        nm.OnClientConnectedCallback += OnClientConnected;
+    }
+
+    public void SubscribeSceneManager()
+    {
+        nm.SceneManager.OnLoadEventCompleted += OnLoadEventCompleted;
     }
 
     void OnDestroy()
     {
         if (nm == null) return;
         nm.ConnectionApprovalCallback -= Approval;
-        nm.OnClientConnectedCallback -= OnClientConnected;
+
+        if (nm.SceneManager != null)
+            nm.SceneManager.OnLoadEventCompleted -= OnLoadEventCompleted;
     }
 
     void Approval(NetworkManager.ConnectionApprovalRequest req,
@@ -35,11 +53,19 @@ public class PlayerSpawner : MonoBehaviour
         res.CreatePlayerObject = false;
     }
 
-    void OnClientConnected(ulong clientId)
+    void OnLoadEventCompleted(string sceneName, LoadSceneMode loadSceneMode,
+        List<ulong> clientsCompleted, List<ulong> clientsTimedOut)
     {
         if (!nm.IsServer) return;
 
-        // Gather spawn points from tagged parent
+        if (SceneManager.GetActiveScene().name != gameplaySceneName)
+            return;
+
+        SpawnAllPlayers();
+    }
+
+    void SpawnAllPlayers()
+    {
         GameObject parent = GameObject.FindGameObjectWithTag(spawnPointParentTag);
         if (parent == null)
         {
@@ -57,13 +83,19 @@ public class PlayerSpawner : MonoBehaviour
             return;
         }
 
-        // Pick a spawn point based on how many players are already spawned
-        int index = (int)(nm.ConnectedClientsIds.Count - 1) % spawnPoints.Count;
-        Transform sp = spawnPoints[index];
+        int index = 0;
+        foreach (ulong clientId in nm.ConnectedClientsIds)
+        {
+            // skip if already spawned
+            if (nm.SpawnManager.GetPlayerNetworkObject(clientId) != null)
+                continue;
 
-        //spawn
+            Transform sp = spawnPoints[index % spawnPoints.Count];
+            index++;
 
-        GameObject player = Instantiate(playerPrefab, sp.position, sp.rotation);
-        player.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId, true);
+            GameObject player = Instantiate(
+                nm.NetworkConfig.PlayerPrefab, sp.position, sp.rotation);
+            player.GetComponent<NetworkObject>().SpawnAsPlayerObject(clientId, true);
+        }
     }
 }

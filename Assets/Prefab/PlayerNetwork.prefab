@@ -2483,6 +2483,7 @@ GameObject:
   - component: {fileID: 6056009129840117750}
   - component: {fileID: 6697702496443770708}
   - component: {fileID: 1071964451505811603}
+  - component: {fileID: 7459332288566040748}
   m_Layer: 7
   m_Name: PlayerNetwork
   m_TagString: Untagged
@@ -2605,6 +2606,9 @@ MonoBehaviour:
   audioSource: {fileID: 1071964451505811603}
   jumpClip: {fileID: 8300000, guid: c7f150288411dc241aa8a62689f2fd7c, type: 3}
   jumpVolume: 1
+  antiGravityJumpHeight: 3
+  antiGravityGravity: -12
+  antiGravityFallMultiplier: 1
   isGrounded: 0
   wasGrounded: 0
   gravityStepIndex: 0
@@ -2789,6 +2793,24 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &7459332288566040748
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6048226838946009357}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e61d352a216145ccbb505e132afa7fc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerRespawn
+  spawnPointParentTag: SpawnPoint
+  respawnDelay: 0.3
+  audioSource: {fileID: 1071964451505811603}
+  deathClip: {fileID: 8300000, guid: c786c25eeb91b4e30a62a375c23784fa, type: 3}
+  deathVolume: 1
+  characterController: {fileID: 2559939509392954331}
 --- !u!1 &6163148213622487917
 GameObject:
   m_ObjectHideFlags: 0

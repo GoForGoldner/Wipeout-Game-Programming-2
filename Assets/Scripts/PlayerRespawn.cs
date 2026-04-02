@@ -1,10 +1,11 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerRespawn : MonoBehaviour
 {
     [Header("Respawn")]
-    public Transform respawnPoint;
+    public string spawnPointParentTag = "SpawnPoint";
     public float respawnDelay = 0.5f;
 
     [Header("Audio")]
@@ -23,6 +24,26 @@ public class PlayerRespawn : MonoBehaviour
         StartCoroutine(RespawnRoutine());
     }
 
+    Transform GetRandomSpawnPoint()
+    {
+        GameObject parent = GameObject.FindGameObjectWithTag(spawnPointParentTag);
+        if (parent == null)
+        {
+            Debug.LogError("No parent found with tag: " + spawnPointParentTag);
+            return null;
+        }
+
+        List<Transform> spawnPoints = new List<Transform>();
+        foreach (Transform t in parent.transform)
+            spawnPoints.Add(t);
+
+        Debug.Log("Found " + spawnPoints.Count + " spawn points");
+
+        if (spawnPoints.Count == 0) return null;
+
+        return spawnPoints[Random.Range(0, spawnPoints.Count)];
+    }
+
     IEnumerator RespawnRoutine()
     {
         isRespawning = true;
@@ -35,11 +56,12 @@ public class PlayerRespawn : MonoBehaviour
 
         yield return new WaitForSeconds(respawnDelay);
 
-        if (respawnPoint != null)
-            transform.position = respawnPoint.position;
-
-        if (respawnPoint != null)
-            transform.rotation = respawnPoint.rotation;
+        Transform sp = GetRandomSpawnPoint();
+        if (sp != null)
+        {
+            transform.position = sp.position;
+            transform.rotation = sp.rotation;
+        }
 
         if (characterController != null)
             characterController.enabled = true;

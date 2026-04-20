@@ -61,13 +61,13 @@ public class PlayerController : MonoBehaviour
     // currently theres a but where when a player moves, the other player starts playing the move animation so i'll be clonning the inputacion for now (FP2)
     InputAction moveAction;
 
-    // Gravity-up vectors per step (step 0 = normal, 1 = right wall, 2 = ceiling, 3 = left wall)
+    // transform.up per step when rotating around world X axis
     static readonly Vector3[] GravityUp =
     {
-        Vector3.up,
-        Vector3.left,
-        Vector3.down,
-        Vector3.right,
+        Vector3.up,      // 0 – normal
+        Vector3.forward, // 1 – 90° around X
+        Vector3.down,    // 2 – 180° around X
+        Vector3.back,    // 3 – 270° around X
     };
 
     CharacterController cc;
@@ -84,9 +84,13 @@ public class PlayerController : MonoBehaviour
     string currentAnim;
     [HideInInspector] public bool isGrounded;
     [HideInInspector] public bool wasGrounded;
+    [HideInInspector] public bool isGravityGrounded; // raycast in current gravity direction only
     bool isDiving;
     bool hasJumped;
+    bool hasFlippedInAir;
     float diveEndTime = -999f;
+
+    bool groundedByCollider;
 
     public int gravityStepIndex;
     Quaternion gravityTargetRot;
@@ -132,17 +136,24 @@ public class PlayerController : MonoBehaviour
 
     // ── Grounded ──────────────────────────────────────────────────────────────
 
+    // OnControllerColliderHit fires synchronously inside cc.Move whenever the CC
+    // physically contacts a surface. We capture "grounded in gravity direction" here
+    // because Physics queries (Raycast/CheckSphere) are unreliable when originating
+    // inside or near convex mesh colliders. The flag is consumed next frame in CheckGrounded.
+    void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        if (Vector3.Dot(hit.normal, transform.up) > 0.5f)
+            groundedByCollider = true;
+    }
+
     void CheckGrounded()
     {
         wasGrounded = isGrounded;
 
-        // Raycast along the player's local down (gravity direction)
-        // cc.isGrounded only works for world-down gravity, so always use the raycast.
-        // Start the ray from slightly inside the capsule bottom to avoid self-hit,
-        // and use a layer mask so it never hits the player itself.
-        Vector3 rayOrigin = transform.position + transform.up * 0.05f;
-        isGrounded = cc.isGrounded ||
-            Physics.Raycast(rayOrigin, -transform.up, cc.height / 2f + 0.2f, collisionMask);
+        isGravityGrounded = groundedByCollider;
+        groundedByCollider = false;
+
+        isGrounded = cc.isGrounded || isGravityGrounded;
 
         if (isGrounded && !wasGrounded)
         {
@@ -152,9 +163,10 @@ public class PlayerController : MonoBehaviour
                 PlayAnim(animDive, 0f);
             }
             hasJumped = false;
+            hasFlippedInAir = false;
+            currentAnim = "";  // force animation re-evaluation on landing
         }
 
-        // Clear dive once the landing hold time expires
         if (isDiving && isGrounded && Time.time >= diveEndTime)
             isDiving = false;
 
@@ -255,7 +267,11 @@ public class PlayerController : MonoBehaviour
                 rotationSpeed * Time.deltaTime);
         }
 
-        if (isGrounded && localVelocity.y < 0f)
+        if (isFlipping)
+        {
+            localVelocity.y = 0f;
+        }
+        else if (isGrounded && localVelocity.y < 0f)
         {
             localVelocity.y = -2f;
         }
@@ -302,11 +318,15 @@ public class PlayerController : MonoBehaviour
     {
         if (animator == null) return;
 
-        // Don't interrupt animation during gravity flip rotation
         if (isFlipping) return;
 
         if (isDiving) { PlayAnim(animDive); return; }
-        if (!isGrounded) { PlayAnim(animJump, 0f); return; }
+        if (!isGrounded)
+        {
+            if (Time.time - lastGroundedTime > 0.1f)
+                PlayAnim(animJump, 0f);
+            return;
+        }
         if (moveValue.sqrMagnitude < 0.01f) { PlayAnim(animIdle); return; }
 
         // currentWorldMove is already in world space; project to local for dir check.
@@ -330,11 +350,12 @@ public class PlayerController : MonoBehaviour
     void HandleFlipInput()
     {
         if (!gravityFlipEnabled || isFlipping) return;
+        if (!isGrounded && hasFlippedInAir) return;
 
-        bool left = rotateLeftActionRef != null && rotateLeftActionRef.action.WasPressedThisFrame();
+        bool left  = rotateLeftActionRef  != null && rotateLeftActionRef.action.WasPressedThisFrame();
         bool right = rotateRightActionRef != null && rotateRightActionRef.action.WasPressedThisFrame();
 
-        if (left) FlipStep(-1);
+        if (left)  FlipStep(-1);
         if (right) FlipStep(+1);
     }
 
@@ -342,13 +363,21 @@ public class PlayerController : MonoBehaviour
     {
         gravityStepIndex = (gravityStepIndex + dir + 4) % 4;
 
-        // Rotate around the world X axis so gravity cycles: down→right→up→left
-        gravityTargetRot = Quaternion.AngleAxis(gravityStepIndex * 90f, Vector3.right);
+        Vector3 newUp = GravityUp[gravityStepIndex];
+
+        // Build target rotation: preserve current facing direction projected onto the new
+        // gravity plane. Falls back to the player's old "down" direction when forward is
+        // parallel to newUp (e.g. step 1 with X-axis rotation when facing +Z).
+        Vector3 flatForward = Vector3.ProjectOnPlane(transform.forward, newUp);
+        if (flatForward.sqrMagnitude < 0.001f)
+            flatForward = Vector3.ProjectOnPlane(-transform.up, newUp);
+        if (flatForward.sqrMagnitude < 0.001f)
+            flatForward = Vector3.ProjectOnPlane(Vector3.right, newUp);
+        gravityTargetRot = Quaternion.LookRotation(flatForward.normalized, newUp);
+        if (!isGrounded) hasFlippedInAir = true;
 
         localVelocity.y = 0f;
         isFlipping = true;
-
-        // Play jump/fall anim to signal the transition
         PlayAnim(animJump, 0.05f);
     }
 
@@ -363,7 +392,7 @@ public class PlayerController : MonoBehaviour
         {
             transform.rotation = gravityTargetRot;
             isFlipping = false;
-            // Force grounded re-check next frame so animation snaps cleanly
+            currentAnim = "";        // force animation re-evaluation this frame
             lastGroundedTime = -999f;
         }
     }
@@ -388,6 +417,7 @@ public class PlayerController : MonoBehaviour
         }
     }
     public void SetGravityFlipEnabled(bool enabled) => gravityFlipEnabled = enabled;
+    public void ToggleGravityFlip() => gravityFlipEnabled = !gravityFlipEnabled;
 
     public void ResetGravityOrientation()
     {

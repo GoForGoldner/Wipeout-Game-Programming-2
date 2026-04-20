@@ -41,7 +41,7 @@ Material:
     - _Intensity: 1
     - _LabSteps: 7.19
     - _PaletteCount: 127
-    - _PixelSize: 2
+    - _PixelSize: 1
     - _UsePalette: 1
     m_Colors:
     - _BlitScaleBias: {r: 1, g: 1, b: 0, a: 0}

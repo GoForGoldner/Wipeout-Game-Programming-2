@@ -31,6 +31,13 @@ public class GameManager : NetworkBehaviour
         winText.SetActive(isWinner);
         loseText.SetActive(!isWinner);
         resultPanel.SetActive(true);
+
+        // Persist win count for the local winning player only.
+        // Each client runs this, but only the actual winner matches the ID.
+        if (isWinner && PlayerProgressManager.Instance != null)
+        {
+            PlayerProgressManager.Instance.AddWin();
+        }
     }
 
     [ServerRpc(RequireOwnership = false)]

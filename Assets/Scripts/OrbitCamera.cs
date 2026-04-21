@@ -15,6 +15,7 @@ public class OrbitCamera : MonoBehaviour
     public float verticalMin = -70f;
     public float verticalMax = 70f;
     public float distance = 4f;
+    float sensitivityMultiplier = 1f;
 
     [Header("Follow")]
     public float followSpeed = 6f;
@@ -41,26 +42,46 @@ public class OrbitCamera : MonoBehaviour
 
     Vector3 smoothGravUp;
     Vector3 camHorizDir;   // world-space horizontal camera direction, always perp to smoothGravUp
-    float   pitch = 17.5f;
-    int     lastStep;
+    float pitch = 17.5f;
+    int lastStep;
     Vector2[] inputBuffer;
-    int       inputBufferIndex;
-    Vector3   currentPivotPos;
+    int inputBufferIndex;
+    Vector3 currentPivotPos;
 
     void Awake()
     {
         if (target) currentPivotPos = target.position;
         if (!cam) cam = GetComponentInChildren<Camera>();
-        inputBuffer  = new Vector2[Mathf.Max(1, inputSmoothFrames)];
+        inputBuffer = new Vector2[Mathf.Max(1, inputSmoothFrames)];
         smoothGravUp = GravityUp[0];
-        camHorizDir  = Vector3.forward;
+        camHorizDir = Vector3.forward;
+
+        // Load saved mouse sensitivity (local to this player)
+        if (PlayerProgressManager.Instance != null)
+        {
+            sensitivityMultiplier = PlayerProgressManager.Instance.Data.settings.mouseSensitivity;
+
+            // Optional: live-update if you add an in-game settings menu later
+            PlayerProgressManager.Instance.OnProgressUpdated += OnSettingsUpdated;
+        }
+    }
+
+    void OnDestroy()
+    {
+        if (PlayerProgressManager.Instance != null)
+            PlayerProgressManager.Instance.OnProgressUpdated -= OnSettingsUpdated;
+    }
+
+    void OnSettingsUpdated()
+    {
+        sensitivityMultiplier = PlayerProgressManager.Instance.Data.settings.mouseSensitivity;
     }
 
     void LateUpdate()
     {
         if (target == null || Mouse.current == null) return;
 
-        int     step   = playerController != null ? playerController.gravityStepIndex : 0;
+        int step = playerController != null ? playerController.gravityStepIndex : 0;
         Vector3 gravUp = GravityUp[step];
 
         // Clear input buffer when the step changes so no stale delta bleeds through.
@@ -82,13 +103,13 @@ public class OrbitCamera : MonoBehaviour
         bool inAir = playerController != null && !playerController.isGrounded;
 
         // ── Pivot follow ──────────────────────────────────────────────────────
-        Vector3 toTarget  = target.position - currentPivotPos;
-        float   gravComp  = Vector3.Dot(toTarget, gravUp);
-        Vector3 gravPart  = gravUp * gravComp;
+        Vector3 toTarget = target.position - currentPivotPos;
+        float gravComp = Vector3.Dot(toTarget, gravUp);
+        Vector3 gravPart = gravUp * gravComp;
         Vector3 horizPart = toTarget - gravPart;
 
-        float vSpeed     = inAir ? jumpFollowSpeed : verticalFollowSpeed;
-        bool  justLanded = !inAir && playerController != null && !playerController.wasGrounded;
+        float vSpeed = inAir ? jumpFollowSpeed : verticalFollowSpeed;
+        bool justLanded = !inAir && playerController != null && !playerController.wasGrounded;
 
         currentPivotPos += horizPart * (followSpeed * Time.deltaTime);
         bool canSnap = step == 0 && (inAir || justLanded);
@@ -106,15 +127,15 @@ public class OrbitCamera : MonoBehaviour
         smoothed /= inputBuffer.Length;
 
         // Azimuth: rotate camHorizDir around the current smoothed gravity up.
-        camHorizDir = Quaternion.AngleAxis(smoothed.x * lookSpeedX, smoothGravUp) * camHorizDir;
+        camHorizDir = Quaternion.AngleAxis(smoothed.x * lookSpeedX * sensitivityMultiplier, smoothGravUp) * camHorizDir;
         camHorizDir = Vector3.ProjectOnPlane(camHorizDir, smoothGravUp).normalized;
 
-        pitch -= smoothed.y * lookSpeedY;
-        pitch  = Mathf.Clamp(pitch, verticalMin, verticalMax);
+        pitch -= smoothed.y * lookSpeedY * sensitivityMultiplier;
+        pitch = Mathf.Clamp(pitch, verticalMin, verticalMax);
 
         // ── Gravity-aware orbit ────────────────────────────────────────────────
         Vector3 camRight = Vector3.Cross(smoothGravUp, camHorizDir).normalized;
-        Vector3 camDir   = Quaternion.AngleAxis(pitch, camRight) * (-camHorizDir);
+        Vector3 camDir = Quaternion.AngleAxis(pitch, camRight) * (-camHorizDir);
 
         // Expose horizontal look direction so PlayerController can use it for movement.
         transform.rotation = Quaternion.LookRotation(camHorizDir, smoothGravUp);
@@ -130,7 +151,7 @@ public class OrbitCamera : MonoBehaviour
     {
         Vector3 v = Mathf.Abs(Vector3.Dot(Vector3.forward, up)) < 0.9f
             ? Vector3.ProjectOnPlane(Vector3.forward, up)
-            : Vector3.ProjectOnPlane(Vector3.right,   up);
+            : Vector3.ProjectOnPlane(Vector3.right, up);
         return v.normalized;
     }
 }

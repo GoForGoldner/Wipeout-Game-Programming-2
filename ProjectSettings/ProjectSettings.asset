@@ -947,11 +947,11 @@ PlayerSettings:
   captureStartupLogs: {}
   activeInputHandler: 1
   windowsGamepadBackendHint: 0
-  cloudProjectId: 11d7bfb7-0bca-4a28-9c47-2ac6ff5077a4
+  cloudProjectId: cfc9816e-0d40-4a06-953b-d55a13cf8f8e
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
-  projectName: Wipeout-Game-Programming-2
-  organizationId: juhynuskim123099
+  projectName: Wipeout
+  organizationId: tytypumpkinguy
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0
   hmiLoadingImage: {fileID: 0}

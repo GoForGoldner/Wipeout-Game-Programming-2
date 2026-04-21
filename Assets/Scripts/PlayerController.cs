@@ -79,6 +79,19 @@ public class PlayerController : MonoBehaviour
     float normalJumpHeight;
     float normalGravity;
     float normalFallMultiplier;
+    float normalMoveSpeed;
+    float normalDiveForwardSpeed;
+    float normalAntiGravityJumpHeight;
+    float normalAntiGravityGravity;
+
+    float baseMoveSpeed;
+    float baseJumpHeight;
+    float baseGravity;
+    float baseFallMultiplier;
+    float baseDiveForwardSpeed;
+    float baseAntiGravityJumpHeight;
+    float baseAntiGravityGravity;
+
     bool antiGravityActive;
 
     string currentAnim;
@@ -101,9 +114,21 @@ public class PlayerController : MonoBehaviour
         cc = GetComponent<CharacterController>();
         gravityTargetRot = transform.rotation;
 
-        normalJumpHeight = jumpHeight;
-        normalGravity = gravity;
-        normalFallMultiplier = fallMultiplier;
+        baseMoveSpeed = moveSpeed;
+        baseJumpHeight = jumpHeight;
+        baseGravity = gravity;
+        baseFallMultiplier = fallMultiplier;
+        baseDiveForwardSpeed = diveForwardSpeed;
+        baseAntiGravityJumpHeight = antiGravityJumpHeight;
+        baseAntiGravityGravity = antiGravityGravity;
+
+        normalMoveSpeed = baseMoveSpeed;
+        normalJumpHeight = baseJumpHeight;
+        normalGravity = baseGravity;
+        normalFallMultiplier = baseFallMultiplier;
+        normalDiveForwardSpeed = baseDiveForwardSpeed;
+        normalAntiGravityJumpHeight = baseAntiGravityJumpHeight;
+        normalAntiGravityGravity = baseAntiGravityGravity;
 
         LockCursor();
     }
@@ -398,6 +423,69 @@ public class PlayerController : MonoBehaviour
     }
 
     // ── Public API ────────────────────────────────────────────────────────────
+
+    public void ResetToBaseStats()
+    {
+        normalMoveSpeed = baseMoveSpeed;
+        normalJumpHeight = baseJumpHeight;
+        normalGravity = baseGravity;
+        normalFallMultiplier = baseFallMultiplier;
+        normalDiveForwardSpeed = baseDiveForwardSpeed;
+        normalAntiGravityJumpHeight = baseAntiGravityJumpHeight;
+        normalAntiGravityGravity = baseAntiGravityGravity;
+
+        moveSpeed = normalMoveSpeed;
+        diveForwardSpeed = normalDiveForwardSpeed;
+        antiGravityJumpHeight = normalAntiGravityJumpHeight;
+        antiGravityGravity = normalAntiGravityGravity;
+
+        if (antiGravityActive)
+        {
+            jumpHeight = antiGravityJumpHeight;
+            gravity = antiGravityGravity;
+            fallMultiplier = antiGravityFallMultiplier;
+        }
+        else
+        {
+            jumpHeight = normalJumpHeight;
+            gravity = normalGravity;
+            fallMultiplier = normalFallMultiplier;
+        }
+    }
+
+    public void ApplyPerk(PerkData perk)
+    {
+        ResetToBaseStats();
+
+        if (perk == null)
+            return;
+
+        normalMoveSpeed += perk.speedBonus;
+        normalJumpHeight += perk.jumpBonus;
+        normalDiveForwardSpeed += perk.diveBonus;
+        normalAntiGravityJumpHeight += perk.antiGravityJumpBonus;
+        normalAntiGravityGravity += perk.antiGravityGravityBonus;
+
+        moveSpeed = normalMoveSpeed;
+        diveForwardSpeed = normalDiveForwardSpeed;
+        antiGravityJumpHeight = normalAntiGravityJumpHeight;
+        antiGravityGravity = normalAntiGravityGravity;
+
+        if (antiGravityActive)
+        {
+            jumpHeight = antiGravityJumpHeight;
+            gravity = antiGravityGravity;
+            fallMultiplier = antiGravityFallMultiplier;
+        }
+        else
+        {
+            jumpHeight = normalJumpHeight;
+            gravity = normalGravity;
+            fallMultiplier = normalFallMultiplier;
+        }
+
+        Debug.Log("Applied perk: " + perk.perkName);
+    }
 
     public void SetAntiGravity(bool enabled)
     {

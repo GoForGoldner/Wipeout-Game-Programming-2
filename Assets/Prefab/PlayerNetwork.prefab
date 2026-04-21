@@ -2484,6 +2484,7 @@ GameObject:
   - component: {fileID: 6697702496443770708}
   - component: {fileID: 1071964451505811603}
   - component: {fileID: 7459332288566040748}
+  - component: {fileID: 6210325447524920856}
   m_Layer: 7
   m_Name: PlayerNetwork
   m_TagString: Untagged
@@ -2611,6 +2612,7 @@ MonoBehaviour:
   antiGravityFallMultiplier: 1
   isGrounded: 0
   wasGrounded: 0
+  isGravityGrounded: 0
   gravityStepIndex: 0
 --- !u!114 &-5794292947960078974
 MonoBehaviour:
@@ -2811,6 +2813,18 @@ MonoBehaviour:
   deathClip: {fileID: 8300000, guid: c786c25eeb91b4e30a62a375c23784fa, type: 3}
   deathVolume: 1
   characterController: {fileID: 2559939509392954331}
+--- !u!114 &6210325447524920856
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6048226838946009357}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 38cb49c27f5f545ccbe843c068c2b003, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerPerkApplier
 --- !u!1 &6163148213622487917
 GameObject:
   m_ObjectHideFlags: 0

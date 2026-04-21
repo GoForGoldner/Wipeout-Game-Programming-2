@@ -28,6 +28,19 @@ public class LobbyUIManager : MonoBehaviour
     void OnStartMatchClicked()
     {
         if (!NetworkManager.Singleton.IsHost) return;
+
+        int playerCount = matchManager.PlayerCount.Value;
+        int minRequired = matchManager.MinPlayersToStart;
+        int actualConnected = NetworkManager.Singleton.ConnectedClients.Count;
+
+        Debug.Log($"PlayerCount.Value = {playerCount}, ConnectedClients.Count = {actualConnected}, MinRequired = {minRequired}");
+
+        if (playerCount < minRequired)
+        {
+            Debug.Log($"Need {minRequired} players to start (currently {playerCount}).");
+            return;
+        }
+
         matchManager.StartMatch();
         SceneLoader.LoadNetworked(gameplaySceneName);
     }

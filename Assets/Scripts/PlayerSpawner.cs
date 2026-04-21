@@ -7,7 +7,9 @@ public class PlayerSpawner : MonoBehaviour
 {
     public static PlayerSpawner Instance { get; private set; }
 
-    public string gameplaySceneName = "GameScene";
+    [Tooltip("Scene names that should trigger player spawning. Add all gameplay level scenes.")]
+    public List<string> gameplaySceneNames = new List<string> { "Level1", "Level2", "Level3" };
+
     public string spawnPointParentTag = "SpawnPoint";
 
     NetworkManager nm;
@@ -58,7 +60,7 @@ public class PlayerSpawner : MonoBehaviour
     {
         if (!nm.IsServer) return;
 
-        if (SceneManager.GetActiveScene().name != gameplaySceneName)
+        if (!gameplaySceneNames.Contains(SceneManager.GetActiveScene().name))
             return;
 
         SpawnAllPlayers();
@@ -86,7 +88,11 @@ public class PlayerSpawner : MonoBehaviour
         int index = 0;
         foreach (ulong clientId in nm.ConnectedClientsIds)
         {
-            // skip if already spawned
+            // Don't spawn eliminated players — they watch via the level's spectator camera.
+            if (MatchManager.Instance != null && MatchManager.Instance.IsEliminated(clientId))
+                continue;
+
+            // Skip if already spawned (shouldn't happen on fresh scene load, but defensive).
             if (nm.SpawnManager.GetPlayerNetworkObject(clientId) != null)
                 continue;
 

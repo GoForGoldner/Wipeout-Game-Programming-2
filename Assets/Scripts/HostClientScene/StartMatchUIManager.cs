@@ -18,7 +18,7 @@ public class StartMatchUIManager : MonoBehaviour
     string clientJoinCode;
     void Start()
     {
-        if(!NetworkManager.Singleton)
+        if (!NetworkManager.Singleton)
             return;
 
         matchManager = FindFirstObjectByType<MatchManager>();
@@ -29,7 +29,7 @@ public class StartMatchUIManager : MonoBehaviour
 
         relayManager = FindFirstObjectByType<RelayConnectionManager>();
         if (relayManager == null) return;
-        
+
         hostButton.onClick.AddListener(OnHostButtonClicked);
         clientButton.onClick.AddListener(OnClientButtonClicked);
 
@@ -47,9 +47,9 @@ public class StartMatchUIManager : MonoBehaviour
     {
         // StartClient();
         clientJoinCode = clientCodeTxt.text;
-        if(!string.IsNullOrEmpty(clientJoinCode))
+        if (!string.IsNullOrEmpty(clientJoinCode))
             StartClientRelay(clientJoinCode);
-        else 
+        else
             clientCodeTxt.text = "Enter Code First";
     }
 
@@ -58,39 +58,37 @@ public class StartMatchUIManager : MonoBehaviour
         NetworkManager.Singleton.StartHost();
         playerSpawner.SubscribeSceneManager();
 
-        if(targetScene != null)
+        if (targetScene != null)
         {
             matchManager.ActivateLobby("");
             SceneLoader.LoadNetworked(targetScene);
         }
-            
+
     }
 
-    
+
     public async void StartHostRelay()
-    {   
+    {
 
         var joinCode = await relayManager.StartHostWithRelay(matchManager.MaxPlayerCount, "wss");
 
         Debug.Log("join code: " + joinCode);
-        NetworkManager.Singleton.StartHost();
-        playerSpawner.SubscribeSceneManager();
 
-        if(targetScene != null && !string.IsNullOrEmpty(joinCode))
+        if (targetScene != null && !string.IsNullOrEmpty(joinCode))
         {
             NetworkManager.Singleton.StartHost();
             playerSpawner.SubscribeSceneManager();
             matchManager.ActivateLobby(joinCode);
             SceneLoader.LoadNetworked(targetScene);
         }
-            
+
     }
     public async void StartClientRelay(string joinCode)
     {
         var result = await relayManager.StartClientWithRelay(joinCode, "wss");
 
-        
-        if(result)
+
+        if (result)
         {
             NetworkManager.Singleton.StartClient();
             playerSpawner.SubscribeSceneManager();

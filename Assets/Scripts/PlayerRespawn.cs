@@ -21,9 +21,17 @@ public class PlayerRespawn : MonoBehaviour
     public void Die()
     {
         if (isRespawning) return;
+
+        // Eliminated players shouldn't respawn - they're just spectating.
+        var netObj = GetComponent<Unity.Netcode.NetworkObject>();
+        if (netObj != null && MatchManager.Instance != null
+            && MatchManager.Instance.IsEliminated(netObj.OwnerClientId))
+        {
+            return;
+        }
+
         StartCoroutine(RespawnRoutine());
     }
-
     Transform GetRandomSpawnPoint()
     {
         GameObject parent = GameObject.FindGameObjectWithTag(spawnPointParentTag);

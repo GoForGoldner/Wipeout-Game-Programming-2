@@ -128,12 +128,9 @@ public class PlayerController : NetworkBehaviour
         normalDiveForwardSpeed = baseDiveForwardSpeed;
         normalAntiGravityJumpHeight = baseAntiGravityJumpHeight;
         normalAntiGravityGravity = baseAntiGravityGravity;
-
-        if (IsOwner)
-            LockCursor();
     }
 
-    void OnEnable()
+    public override void OnNetworkSpawn()
     {
         if (!IsOwner) return;
 
@@ -141,9 +138,11 @@ public class PlayerController : NetworkBehaviour
         jumpActionRef?.action.Enable();
         rotateLeftActionRef?.action.Enable();
         rotateRightActionRef?.action.Enable();
+
+        LockCursor();
     }
 
-    void OnDisable()
+    public override void OnNetworkDespawn()
     {
         if (!IsOwner) return;
 

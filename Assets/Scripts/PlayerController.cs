@@ -1,8 +1,9 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Unity.Netcode;
 
 [RequireComponent(typeof(CharacterController))]
-public class PlayerController : MonoBehaviour
+public class PlayerController : NetworkBehaviour
 {
     [Header("Input")]
     public InputActionReference moveActionRef;
@@ -128,11 +129,14 @@ public class PlayerController : MonoBehaviour
         normalAntiGravityJumpHeight = baseAntiGravityJumpHeight;
         normalAntiGravityGravity = baseAntiGravityGravity;
 
-        LockCursor();
+        if (IsOwner)
+            LockCursor();
     }
 
     void OnEnable()
     {
+        if (!IsOwner) return;
+
         moveActionRef?.action.Enable();
         jumpActionRef?.action.Enable();
         rotateLeftActionRef?.action.Enable();
@@ -141,6 +145,8 @@ public class PlayerController : MonoBehaviour
 
     void OnDisable()
     {
+        if (!IsOwner) return;
+
         moveActionRef?.action.Disable();
         jumpActionRef?.action.Disable();
         rotateLeftActionRef?.action.Disable();
@@ -149,6 +155,8 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        if (!IsOwner) return;
+
         HandleCursor();
         HandleFlipInput();
         AnimateFlip();
@@ -159,6 +167,8 @@ public class PlayerController : MonoBehaviour
 
     void OnControllerColliderHit(ControllerColliderHit hit)
     {
+        if (!IsOwner) return;
+
         if (Vector3.Dot(hit.normal, transform.up) > 0.5f)
             groundedByCollider = true;
     }
@@ -181,7 +191,7 @@ public class PlayerController : MonoBehaviour
             }
             hasJumped = false;
             hasFlippedInAir = false;
-            currentAnim = "";  // force animation re-evaluation on landing
+            currentAnim = "";
         }
 
         if (isDiving && isGrounded && Time.time >= diveEndTime)
@@ -291,6 +301,7 @@ public class PlayerController : MonoBehaviour
             float multiplier = localVelocity.y < 0f ? fallMultiplier : 1f;
             localVelocity.y += gravity * multiplier * Time.deltaTime;
         }
+
         Vector3 verticalWorld = up * localVelocity.y;
         cc.Move((currentWorldMove + verticalWorld) * Time.deltaTime);
 
@@ -299,18 +310,17 @@ public class PlayerController : MonoBehaviour
 
     void PlayAnim(string anim, float crossFade = 0.1f)
     {
+        if (animator == null) return;
         if (anim == currentAnim) return;
+
         currentAnim = anim;
         animator.CrossFadeInFixedTime(anim, crossFade);
     }
 
     void PlayJumpSound()
     {
-        if (audioSource == null)
-            return;
-
-        if (jumpClip == null)
-            return;
+        if (audioSource == null) return;
+        if (jumpClip == null) return;
 
         audioSource.PlayOneShot(jumpClip, jumpVolume);
     }
@@ -318,17 +328,26 @@ public class PlayerController : MonoBehaviour
     void UpdateAnimation(Vector2 moveValue, Vector3 currentWorldMove)
     {
         if (animator == null) return;
-
         if (isFlipping) return;
 
-        if (isDiving) { PlayAnim(animDive); return; }
+        if (isDiving)
+        {
+            PlayAnim(animDive);
+            return;
+        }
+
         if (!isGrounded)
         {
             if (Time.time - lastGroundedTime > 0.1f)
                 PlayAnim(animJump, 0f);
             return;
         }
-        if (moveValue.sqrMagnitude < 0.01f) { PlayAnim(animIdle); return; }
+
+        if (moveValue.sqrMagnitude < 0.01f)
+        {
+            PlayAnim(animIdle);
+            return;
+        }
 
         Vector3 localMove = transform.InverseTransformDirection(currentWorldMove);
         float absX = Mathf.Abs(localMove.x);
@@ -348,10 +367,10 @@ public class PlayerController : MonoBehaviour
         if (!gravityFlipEnabled || isFlipping) return;
         if (!isGrounded && hasFlippedInAir) return;
 
-        bool left  = rotateLeftActionRef  != null && rotateLeftActionRef.action.WasPressedThisFrame();
+        bool left = rotateLeftActionRef != null && rotateLeftActionRef.action.WasPressedThisFrame();
         bool right = rotateRightActionRef != null && rotateRightActionRef.action.WasPressedThisFrame();
 
-        if (left)  FlipStep(-1);
+        if (left) FlipStep(-1);
         if (right) FlipStep(+1);
     }
 
@@ -366,7 +385,9 @@ public class PlayerController : MonoBehaviour
             flatForward = Vector3.ProjectOnPlane(-transform.up, newUp);
         if (flatForward.sqrMagnitude < 0.001f)
             flatForward = Vector3.ProjectOnPlane(Vector3.right, newUp);
+
         gravityTargetRot = Quaternion.LookRotation(flatForward.normalized, newUp);
+
         if (!isGrounded) hasFlippedInAir = true;
 
         localVelocity.y = 0f;
@@ -385,7 +406,7 @@ public class PlayerController : MonoBehaviour
         {
             transform.rotation = gravityTargetRot;
             isFlipping = false;
-            currentAnim = "";        // force animation re-evaluation this frame
+            currentAnim = "";
             lastGroundedTime = -999f;
         }
     }
@@ -470,6 +491,7 @@ public class PlayerController : MonoBehaviour
             fallMultiplier = normalFallMultiplier;
         }
     }
+
     public void SetGravityFlipEnabled(bool enabled) => gravityFlipEnabled = enabled;
     public void ToggleGravityFlip() => gravityFlipEnabled = !gravityFlipEnabled;
 
@@ -488,11 +510,21 @@ public class PlayerController : MonoBehaviour
     {
         if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
             UnlockCursor();
+
         if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame
             && Cursor.lockState != CursorLockMode.Locked)
             LockCursor();
     }
 
-    void LockCursor() { Cursor.lockState = CursorLockMode.Locked; Cursor.visible = false; }
-    void UnlockCursor() { Cursor.lockState = CursorLockMode.None; Cursor.visible = true; }
+    void LockCursor()
+    {
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+    }
+
+    void UnlockCursor()
+    {
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+    }
 }

@@ -41,13 +41,11 @@ public class StartMatchUIManager : MonoBehaviour
 
     void OnHostButtonClicked()
     {
-        // StartHost();
         StartHostRelay();
     }
 
     void OnClientButtonClicked()
     {
-        // StartClient();
         clientJoinCode = clientCodeTxt.text;
         if (!string.IsNullOrEmpty(clientJoinCode))
             StartClientRelay(clientJoinCode);

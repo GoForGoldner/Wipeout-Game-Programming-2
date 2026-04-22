@@ -37,7 +37,6 @@ public class ObstacleSpawner : NetworkBehaviour
 
         seed.OnValueChanged += OnSeedReceived;
 
-        // If seed already arrived (host or late join), generate now.
         if (seed.Value != 0) Generate(seed.Value);
     }
 
@@ -56,8 +55,6 @@ public class ObstacleSpawner : NetworkBehaviour
         var rng = new System.Random(seedValue);
         int spawned = 0;
 
-        // Children are iterated in their hierarchy order, which is identical across
-        // clients as long as the scene is the same. That keeps picks in sync.
         foreach (Transform child in transform)
         {
             GameObject prefab = PickPrefab(rng);
@@ -74,7 +71,6 @@ public class ObstacleSpawner : NetworkBehaviour
     {
         if (obstacles == null || obstacles.Length == 0) return null;
 
-        // Empty-chance roll first.
         if (emptyChance > 0f && rng.NextDouble() < emptyChance) return null;
 
         float totalWeight = 0f;
@@ -100,7 +96,6 @@ public class ObstacleSpawner : NetworkBehaviour
 
     void OnDrawGizmos()
     {
-        // Visualize spawn points as cyan circles in the editor.
         Gizmos.color = Color.cyan;
         foreach (Transform child in transform)
         {

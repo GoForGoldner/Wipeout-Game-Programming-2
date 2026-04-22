@@ -92,7 +92,6 @@ public class PlayerSpawner : MonoBehaviour
             if (MatchManager.Instance != null && MatchManager.Instance.IsEliminated(clientId))
                 continue;
 
-            // Skip if already spawned (shouldn't happen on fresh scene load, but defensive).
             if (nm.SpawnManager.GetPlayerNetworkObject(clientId) != null)
                 continue;
 

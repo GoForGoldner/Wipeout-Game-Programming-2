@@ -2,11 +2,6 @@ using System;
 using System.IO;
 using UnityEngine;
 
-/// <summary>
-/// Persistent player progress manager. Loads on Awake, saves on quit/pause
-/// and whenever progress is updated via the public API.
-/// Uses Observer pattern (OnProgressUpdated event) so UI can refresh without polling.
-/// </summary>
 public class PlayerProgressManager : MonoBehaviour
 {
     public static PlayerProgressManager Instance { get; private set; }
@@ -15,7 +10,6 @@ public class PlayerProgressManager : MonoBehaviour
 
     public PlayerProgressData Data { get; private set; }
 
-    // Observer pattern — UI subscribes to this instead of polling in Update()
     public event Action OnProgressUpdated;
 
     string FilePath => Path.Combine(Application.persistentDataPath, fileName);
@@ -35,8 +29,6 @@ public class PlayerProgressManager : MonoBehaviour
 
     void Update()
     {
-        // Track total play time. Uses unscaledDeltaTime so pausing the game
-        // (Time.timeScale = 0) doesn't freeze this counter if you don't want it to.
         if (Data != null)
         {
             Data.totalPlayTimeSeconds += Time.unscaledDeltaTime;
@@ -53,8 +45,6 @@ public class PlayerProgressManager : MonoBehaviour
     {
         if (paused) SaveProgress();
     }
-
-    // ---------- Load / Save ----------
 
     public void LoadProgress()
     {
@@ -91,16 +81,12 @@ public class PlayerProgressManager : MonoBehaviour
             Data.lastPlayedDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
             string json = JsonUtility.ToJson(Data, true);
             File.WriteAllText(FilePath, json);
-            // Debug.Log($"[Progress] Saved to {FilePath}");
         }
         catch (Exception e)
         {
             Debug.LogError($"[Progress] Save failed: {e.Message}");
         }
     }
-
-    // ---------- Public API ----------
-    // Call these from your gameplay code. They fire the event + autosave.
 
     public void AddWin()
     {

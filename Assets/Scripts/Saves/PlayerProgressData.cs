@@ -4,15 +4,12 @@ using System.Collections.Generic;
 [Serializable]
 public class PlayerProgressData
 {
-    // Stats shown on the main menu
     public int totalWins;
     public float totalPlayTimeSeconds;
     public string lastPlayedDate;
 
-    // Per-level progress (optional but nice for polish)
     public List<LevelProgress> levels = new List<LevelProgress>();
 
-    // Settings that persist across sessions
     public GameSettings settings = new GameSettings();
 }
 

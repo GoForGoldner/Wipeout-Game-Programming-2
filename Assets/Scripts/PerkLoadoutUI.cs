@@ -64,7 +64,6 @@ public class PerkLoadoutUI : MonoBehaviour
         {
             ulong localId = NetworkManager.Singleton != null ? NetworkManager.Singleton.LocalClientId : ulong.MaxValue;
 
-            // After Round 1 has started, eliminated players should not see or use perk selection.
             if (MatchManager.Instance != null &&
                 MatchManager.Instance.PlayersInLevel.Value > 0 &&
                 MatchManager.Instance.IsEliminated(localId))
@@ -78,7 +77,6 @@ public class PerkLoadoutUI : MonoBehaviour
             if (confirmButton != null)
                 confirmButton.interactable = PerkInventory.Instance != null && PerkInventory.Instance.HasSelection();
 
-            // Restore previous selection if one exists for this client
             if (MatchManager.Instance != null && PerkInventory.Instance != null)
             {
                 int perkIndex = MatchManager.Instance.GetLocalPerkIndex();

@@ -153,7 +153,6 @@ public class MatchManager : NetworkBehaviour
 
         foreach (ulong clientId in NetworkManager.Singleton.ConnectedClientsIds)
         {
-            // After Round 1 starts, only survivors should participate in later perk picks.
             if (PlayersInLevel.Value > 0 && IsEliminated(clientId))
                 continue;
 
@@ -216,7 +215,6 @@ public class MatchManager : NetworkBehaviour
 
         ulong senderId = rpcParams.Receive.SenderClientId;
 
-        // After Round 1 has begun, eliminated players are not allowed to pick perks anymore.
         if (PlayersInLevel.Value > 0 && IsEliminated(senderId))
         {
             Debug.Log($"Ignoring perk selection from eliminated client {senderId}.");
@@ -247,8 +245,6 @@ public class MatchManager : NetworkBehaviour
 
         return -1;
     }
-
-    // ────────────────────────────── Match flow ──────────────────────────────
 
     public void StartInitialMatch()
     {
@@ -305,8 +301,6 @@ public class MatchManager : NetworkBehaviour
         if (!IsServer) return;
         State.Value = MatchState.Joinning;
     }
-
-    // ────────────────────────────── Elimination ──────────────────────────────
 
     public void MarkEliminated(ulong clientId)
     {

@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(CharacterController))]
@@ -39,10 +39,10 @@ public class PlayerController : MonoBehaviour
     public string animRunRight = "RunRight";
     public string animDive = "Slide";
     public string animJump = "Jump";
-    public string animFall = "Jump"; // set to a Fall state name if you have one
+    public string animFall = "Jump";
 
     [Header("Ground Check")]
-    public LayerMask collisionMask = ~0; // default: everything
+    public LayerMask collisionMask = ~0;
 
     [Header("Gravity Flip")]
     public bool gravityFlipEnabled = true;
@@ -58,16 +58,14 @@ public class PlayerController : MonoBehaviour
     public float antiGravityGravity = -12f;
     public float antiGravityFallMultiplier = 1.0f;
 
-    // currently theres a but where when a player moves, the other player starts playing the move animation so i'll be clonning the inputacion for now (FP2)
     InputAction moveAction;
 
-    // transform.up per step when rotating around world X axis
     static readonly Vector3[] GravityUp =
     {
-        Vector3.up,      // 0 – normal
-        Vector3.forward, // 1 – 90° around X
-        Vector3.down,    // 2 – 180° around X
-        Vector3.back,    // 3 – 270° around X
+        Vector3.up,
+        Vector3.forward,
+        Vector3.down,
+        Vector3.back,
     };
 
     CharacterController cc;
@@ -97,7 +95,7 @@ public class PlayerController : MonoBehaviour
     string currentAnim;
     [HideInInspector] public bool isGrounded;
     [HideInInspector] public bool wasGrounded;
-    [HideInInspector] public bool isGravityGrounded; // raycast in current gravity direction only
+    [HideInInspector] public bool isGravityGrounded;
     bool isDiving;
     bool hasJumped;
     bool hasFlippedInAir;
@@ -159,12 +157,6 @@ public class PlayerController : MonoBehaviour
         Move();
     }
 
-    // ── Grounded ──────────────────────────────────────────────────────────────
-
-    // OnControllerColliderHit fires synchronously inside cc.Move whenever the CC
-    // physically contacts a surface. We capture "grounded in gravity direction" here
-    // because Physics queries (Raycast/CheckSphere) are unreliable when originating
-    // inside or near convex mesh colliders. The flag is consumed next frame in CheckGrounded.
     void OnControllerColliderHit(ControllerColliderHit hit)
     {
         if (Vector3.Dot(hit.normal, transform.up) > 0.5f)
@@ -198,8 +190,6 @@ public class PlayerController : MonoBehaviour
         if (isGrounded)
             lastGroundedTime = Time.time;
     }
-
-    // ── Jump ──────────────────────────────────────────────────────────────────
 
     void HandleJumpInput()
     {
@@ -242,8 +232,6 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    // ── Move ──────────────────────────────────────────────────────────────────
-
     void Move()
     {
         if (cc == null || !cc.enabled) return;
@@ -252,7 +240,7 @@ public class PlayerController : MonoBehaviour
             ? moveActionRef.action.ReadValue<Vector2>()
             : Vector2.zero;
 
-        Vector3 up = transform.up; // always gravity-relative
+        Vector3 up = transform.up;
 
         Vector3 moveDir = Vector3.zero;
         if (cameraPivot && moveValue.sqrMagnitude > 0.01f)
@@ -264,7 +252,6 @@ public class PlayerController : MonoBehaviour
 
         Vector3 targetWorldMove = moveDir * moveSpeed;
 
-        // Block horizontal movement during dive landing recovery
         bool inDiveRecovery = isDiving && isGrounded;
         if (inDiveRecovery) targetWorldMove = Vector3.zero;
         Vector3 currentWorldMove = transform.TransformDirection(
@@ -283,7 +270,6 @@ public class PlayerController : MonoBehaviour
         Vector3 localHorizontal = transform.InverseTransformDirection(currentWorldMove);
         currentLocalMove = new Vector3(localHorizontal.x, 0f, localHorizontal.z);
 
-        // Only rotate toward movement when not flipping
         if (!isFlipping && currentWorldMove.sqrMagnitude > 0.001f)
         {
             transform.rotation = Quaternion.Slerp(
@@ -311,8 +297,6 @@ public class PlayerController : MonoBehaviour
         UpdateAnimation(moveValue, currentWorldMove);
     }
 
-    // ── Animation ─────────────────────────────────────────────────────────────
-
     void PlayAnim(string anim, float crossFade = 0.1f)
     {
         if (anim == currentAnim) return;
@@ -322,19 +306,11 @@ public class PlayerController : MonoBehaviour
 
     void PlayJumpSound()
     {
-        //Debug.Log("PlayJumpSound called");
-
         if (audioSource == null)
-        {
-            //Debug.LogWarning("AudioSource is NULL");
             return;
-        }
 
         if (jumpClip == null)
-        {
-            //Debug.LogWarning("jumpClip is NULL");
             return;
-        }
 
         audioSource.PlayOneShot(jumpClip, jumpVolume);
     }
@@ -354,9 +330,6 @@ public class PlayerController : MonoBehaviour
         }
         if (moveValue.sqrMagnitude < 0.01f) { PlayAnim(animIdle); return; }
 
-        // currentWorldMove is already in world space; project to local for dir check.
-        // transform.up is always the gravity-relative up, so InverseTransformDirection
-        // gives us forward/right relative to the player's current gravity orientation.
         Vector3 localMove = transform.InverseTransformDirection(currentWorldMove);
         float absX = Mathf.Abs(localMove.x);
         float absZ = Mathf.Abs(localMove.z);
@@ -369,8 +342,6 @@ public class PlayerController : MonoBehaviour
 
         PlayAnim(target);
     }
-
-    // ── Gravity Flip ──────────────────────────────────────────────────────────
 
     void HandleFlipInput()
     {
@@ -390,9 +361,6 @@ public class PlayerController : MonoBehaviour
 
         Vector3 newUp = GravityUp[gravityStepIndex];
 
-        // Build target rotation: preserve current facing direction projected onto the new
-        // gravity plane. Falls back to the player's old "down" direction when forward is
-        // parallel to newUp (e.g. step 1 with X-axis rotation when facing +Z).
         Vector3 flatForward = Vector3.ProjectOnPlane(transform.forward, newUp);
         if (flatForward.sqrMagnitude < 0.001f)
             flatForward = Vector3.ProjectOnPlane(-transform.up, newUp);
@@ -421,8 +389,6 @@ public class PlayerController : MonoBehaviour
             lastGroundedTime = -999f;
         }
     }
-
-    // ── Public API ────────────────────────────────────────────────────────────
 
     public void ResetToBaseStats()
     {
@@ -517,8 +483,6 @@ public class PlayerController : MonoBehaviour
         hasJumped = false;
         transform.rotation = gravityTargetRot;
     }
-
-    // ── Cursor ────────────────────────────────────────────────────────────────
 
     void HandleCursor()
     {

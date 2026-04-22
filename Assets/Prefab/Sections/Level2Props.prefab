@@ -174,6 +174,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Props_2 (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 5927385371276705707, guid: 2de3d7ed8ce094e4b86597a811edf5b5, type: 3}
+      propertyPath: m_TagString
+      value: DeathlyTrap
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -280,6 +284,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Props_2 (12)
       objectReference: {fileID: 0}
+    - target: {fileID: 5927385371276705707, guid: 2de3d7ed8ce094e4b86597a811edf5b5, type: 3}
+      propertyPath: m_TagString
+      value: DeathlyTrap
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -385,6 +393,10 @@ PrefabInstance:
     - target: {fileID: 5927385371276705707, guid: 2de3d7ed8ce094e4b86597a811edf5b5, type: 3}
       propertyPath: m_Name
       value: Props_2 (13)
+      objectReference: {fileID: 0}
+    - target: {fileID: 5927385371276705707, guid: 2de3d7ed8ce094e4b86597a811edf5b5, type: 3}
+      propertyPath: m_TagString
+      value: DeathlyTrap
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -500,6 +512,10 @@ PrefabInstance:
       propertyPath: 'm_Materials.Array.data[1]'
       value: 
       objectReference: {fileID: 2100000, guid: 36365474cbb74a246af7c5ab417e6bc9, type: 2}
+    - target: {fileID: 5338071358202630470, guid: 32f8781aed4186344b891265e4f57e19, type: 3}
+      propertyPath: m_TagString
+      value: DeathlyTrap
+      objectReference: {fileID: 0}
     - target: {fileID: 8385945678036860757, guid: 32f8781aed4186344b891265e4f57e19, type: 3}
       propertyPath: m_Name
       value: Props_5
@@ -514,12 +530,41 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 8385945678036860757, guid: 32f8781aed4186344b891265e4f57e19, type: 3}
       insertIndex: -1
       addedObject: {fileID: 7361150808596893812}
+    - targetCorrespondingSourceObject: {fileID: 5338071358202630470, guid: 32f8781aed4186344b891265e4f57e19, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3082931837428692125}
   m_SourcePrefab: {fileID: 100100000, guid: 32f8781aed4186344b891265e4f57e19, type: 3}
 --- !u!4 &1918544571287706699 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1194692560944463858, guid: 32f8781aed4186344b891265e4f57e19, type: 3}
   m_PrefabInstance: {fileID: 735332015766692793}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &4620920871163540223 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5338071358202630470, guid: 32f8781aed4186344b891265e4f57e19, type: 3}
+  m_PrefabInstance: {fileID: 735332015766692793}
+  m_PrefabAsset: {fileID: 0}
+--- !u!65 &3082931837428692125
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4620920871163540223}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.7695269, y: 0.72525144, z: 4.627401}
+  m_Center: {x: -0.0000038146973, y: 0, z: -0.0000076293945}
 --- !u!1 &9103096165060386028 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8385945678036860757, guid: 32f8781aed4186344b891265e4f57e19, type: 3}
@@ -575,6 +620,10 @@ PrefabInstance:
       propertyPath: 'm_Materials.Array.data[3]'
       value: 
       objectReference: {fileID: 2100000, guid: 64f2b6d3297eb9a40992dff657a09417, type: 2}
+    - target: {fileID: 2891417792364849616, guid: d9c63dd33821be04586de9289ce9d1b3, type: 3}
+      propertyPath: m_TagString
+      value: DeathlyTrap
+      objectReference: {fileID: 0}
     - target: {fileID: 4502365455667838843, guid: d9c63dd33821be04586de9289ce9d1b3, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
@@ -637,7 +686,36 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 8282558055256507817, guid: d9c63dd33821be04586de9289ce9d1b3, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1173298112330102076}
+    - targetCorrespondingSourceObject: {fileID: 2891417792364849616, guid: d9c63dd33821be04586de9289ce9d1b3, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5998590611817120252}
   m_SourcePrefab: {fileID: 100100000, guid: d9c63dd33821be04586de9289ce9d1b3, type: 3}
+--- !u!1 &4211190395972092395 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2891417792364849616, guid: d9c63dd33821be04586de9289ce9d1b3, type: 3}
+  m_PrefabInstance: {fileID: 1319913629194299451}
+  m_PrefabAsset: {fileID: 0}
+--- !u!65 &5998590611817120252
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4211190395972092395}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2.4448266, y: 0.22537549, z: 0.63699985}
+  m_Center: {x: 0.95827913, y: 0, z: -0.013039082}
 --- !u!1 &6962785857196518802 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8282558055256507817, guid: d9c63dd33821be04586de9289ce9d1b3, type: 3}
@@ -733,6 +811,10 @@ PrefabInstance:
     - target: {fileID: 5927385371276705707, guid: 2de3d7ed8ce094e4b86597a811edf5b5, type: 3}
       propertyPath: m_Name
       value: Props_2 (11)
+      objectReference: {fileID: 0}
+    - target: {fileID: 5927385371276705707, guid: 2de3d7ed8ce094e4b86597a811edf5b5, type: 3}
+      propertyPath: m_TagString
+      value: DeathlyTrap
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -840,6 +922,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Props_2 (14)
       objectReference: {fileID: 0}
+    - target: {fileID: 5927385371276705707, guid: 2de3d7ed8ce094e4b86597a811edf5b5, type: 3}
+      propertyPath: m_TagString
+      value: DeathlyTrap
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -910,6 +996,10 @@ PrefabInstance:
       propertyPath: 'm_Materials.Array.data[3]'
       value: 
       objectReference: {fileID: 2100000, guid: 64f2b6d3297eb9a40992dff657a09417, type: 2}
+    - target: {fileID: 2891417792364849616, guid: d9c63dd33821be04586de9289ce9d1b3, type: 3}
+      propertyPath: m_TagString
+      value: DeathlyTrap
+      objectReference: {fileID: 0}
     - target: {fileID: 4502365455667838843, guid: d9c63dd33821be04586de9289ce9d1b3, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
@@ -972,7 +1062,36 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 8282558055256507817, guid: d9c63dd33821be04586de9289ce9d1b3, type: 3}
       insertIndex: -1
       addedObject: {fileID: 345074815438715538}
+    - targetCorrespondingSourceObject: {fileID: 2891417792364849616, guid: d9c63dd33821be04586de9289ce9d1b3, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3752316656229505403}
   m_SourcePrefab: {fileID: 100100000, guid: d9c63dd33821be04586de9289ce9d1b3, type: 3}
+--- !u!1 &3818492823793346293 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2891417792364849616, guid: d9c63dd33821be04586de9289ce9d1b3, type: 3}
+  m_PrefabInstance: {fileID: 2080209841564028709}
+  m_PrefabAsset: {fileID: 0}
+--- !u!65 &3752316656229505403
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3818492823793346293}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2.4448266, y: 0.22537549, z: 0.63699985}
+  m_Center: {x: 0.95827913, y: 0, z: -0.013039082}
 --- !u!1 &7939825798929664652 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8282558055256507817, guid: d9c63dd33821be04586de9289ce9d1b3, type: 3}
@@ -1033,6 +1152,10 @@ PrefabInstance:
       propertyPath: 'm_Materials.Array.data[3]'
       value: 
       objectReference: {fileID: 2100000, guid: 64f2b6d3297eb9a40992dff657a09417, type: 2}
+    - target: {fileID: 2891417792364849616, guid: d9c63dd33821be04586de9289ce9d1b3, type: 3}
+      propertyPath: m_TagString
+      value: DeathlyTrap
+      objectReference: {fileID: 0}
     - target: {fileID: 4502365455667838843, guid: d9c63dd33821be04586de9289ce9d1b3, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
@@ -1095,7 +1218,36 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 8282558055256507817, guid: d9c63dd33821be04586de9289ce9d1b3, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2841702456741187451}
+    - targetCorrespondingSourceObject: {fileID: 2891417792364849616, guid: d9c63dd33821be04586de9289ce9d1b3, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8915583298811947244}
   m_SourcePrefab: {fileID: 100100000, guid: d9c63dd33821be04586de9289ce9d1b3, type: 3}
+--- !u!1 &710427953879670264 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2891417792364849616, guid: d9c63dd33821be04586de9289ce9d1b3, type: 3}
+  m_PrefabInstance: {fileID: 2448712847608771624}
+  m_PrefabAsset: {fileID: 0}
+--- !u!65 &8915583298811947244
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 710427953879670264}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2.4448266, y: 0.22537549, z: 0.63699985}
+  m_Center: {x: 0.95827913, y: 0, z: -0.013031453}
 --- !u!4 &4636335119682812300 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7038001857200606628, guid: d9c63dd33821be04586de9289ce9d1b3, type: 3}
@@ -1191,6 +1343,10 @@ PrefabInstance:
     - target: {fileID: 5927385371276705707, guid: 2de3d7ed8ce094e4b86597a811edf5b5, type: 3}
       propertyPath: m_Name
       value: Props_2 (17)
+      objectReference: {fileID: 0}
+    - target: {fileID: 5927385371276705707, guid: 2de3d7ed8ce094e4b86597a811edf5b5, type: 3}
+      propertyPath: m_TagString
+      value: DeathlyTrap
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1424,6 +1580,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Props_2 (15)
       objectReference: {fileID: 0}
+    - target: {fileID: 5927385371276705707, guid: 2de3d7ed8ce094e4b86597a811edf5b5, type: 3}
+      propertyPath: m_TagString
+      value: DeathlyTrap
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1538,6 +1698,10 @@ PrefabInstance:
       propertyPath: 'm_Materials.Array.data[1]'
       value: 
       objectReference: {fileID: 2100000, guid: 36365474cbb74a246af7c5ab417e6bc9, type: 2}
+    - target: {fileID: 5338071358202630470, guid: 32f8781aed4186344b891265e4f57e19, type: 3}
+      propertyPath: m_TagString
+      value: DeathlyTrap
+      objectReference: {fileID: 0}
     - target: {fileID: 8385945678036860757, guid: 32f8781aed4186344b891265e4f57e19, type: 3}
       propertyPath: m_Name
       value: Props_5 (1)
@@ -1552,6 +1716,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 8385945678036860757, guid: 32f8781aed4186344b891265e4f57e19, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1974547435287592270}
+    - targetCorrespondingSourceObject: {fileID: 5338071358202630470, guid: 32f8781aed4186344b891265e4f57e19, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5756340852050406908}
   m_SourcePrefab: {fileID: 100100000, guid: 32f8781aed4186344b891265e4f57e19, type: 3}
 --- !u!4 &4249422211688590940 stripped
 Transform:
@@ -1597,6 +1764,32 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Rotate
   speed: 67
+--- !u!1 &6951376322352759016 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5338071358202630470, guid: 32f8781aed4186344b891265e4f57e19, type: 3}
+  m_PrefabInstance: {fileID: 3056990257745433006}
+  m_PrefabAsset: {fileID: 0}
+--- !u!65 &5756340852050406908
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6951376322352759016}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.7695269, y: 0.72525144, z: 4.627401}
+  m_Center: {x: 0.0000038146973, y: 0, z: -0.0000076293945}
 --- !u!1001 &3501409890057828847
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1648,6 +1841,10 @@ PrefabInstance:
     - target: {fileID: 5927385371276705707, guid: 2de3d7ed8ce094e4b86597a811edf5b5, type: 3}
       propertyPath: m_Name
       value: Props_2 (7)
+      objectReference: {fileID: 0}
+    - target: {fileID: 5927385371276705707, guid: 2de3d7ed8ce094e4b86597a811edf5b5, type: 3}
+      propertyPath: m_TagString
+      value: DeathlyTrap
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1755,6 +1952,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Props_2 (6)
       objectReference: {fileID: 0}
+    - target: {fileID: 5927385371276705707, guid: 2de3d7ed8ce094e4b86597a811edf5b5, type: 3}
+      propertyPath: m_TagString
+      value: DeathlyTrap
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1861,6 +2062,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Props_2 (16)
       objectReference: {fileID: 0}
+    - target: {fileID: 5927385371276705707, guid: 2de3d7ed8ce094e4b86597a811edf5b5, type: 3}
+      propertyPath: m_TagString
+      value: DeathlyTrap
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1931,6 +2136,10 @@ PrefabInstance:
       propertyPath: 'm_Materials.Array.data[3]'
       value: 
       objectReference: {fileID: 2100000, guid: 64f2b6d3297eb9a40992dff657a09417, type: 2}
+    - target: {fileID: 2891417792364849616, guid: d9c63dd33821be04586de9289ce9d1b3, type: 3}
+      propertyPath: m_TagString
+      value: DeathlyTrap
+      objectReference: {fileID: 0}
     - target: {fileID: 4502365455667838843, guid: d9c63dd33821be04586de9289ce9d1b3, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
@@ -1993,7 +2202,36 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 8282558055256507817, guid: d9c63dd33821be04586de9289ce9d1b3, type: 3}
       insertIndex: -1
       addedObject: {fileID: 5368062551041166871}
+    - targetCorrespondingSourceObject: {fileID: 2891417792364849616, guid: d9c63dd33821be04586de9289ce9d1b3, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5927562288039975866}
   m_SourcePrefab: {fileID: 100100000, guid: d9c63dd33821be04586de9289ce9d1b3, type: 3}
+--- !u!1 &2163528224488263937 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2891417792364849616, guid: d9c63dd33821be04586de9289ce9d1b3, type: 3}
+  m_PrefabInstance: {fileID: 3901810923450480849}
+  m_PrefabAsset: {fileID: 0}
+--- !u!65 &5927562288039975866
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2163528224488263937}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2.4448266, y: 0.22537549, z: 0.63699985}
+  m_Center: {x: 0.95827913, y: 0, z: -0.013039082}
 --- !u!1 &4960586310753222008 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8282558055256507817, guid: d9c63dd33821be04586de9289ce9d1b3, type: 3}
@@ -2089,6 +2327,10 @@ PrefabInstance:
     - target: {fileID: 5927385371276705707, guid: 2de3d7ed8ce094e4b86597a811edf5b5, type: 3}
       propertyPath: m_Name
       value: Props_2 (9)
+      objectReference: {fileID: 0}
+    - target: {fileID: 5927385371276705707, guid: 2de3d7ed8ce094e4b86597a811edf5b5, type: 3}
+      propertyPath: m_TagString
+      value: DeathlyTrap
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2196,6 +2438,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Props_2 (10)
       objectReference: {fileID: 0}
+    - target: {fileID: 5927385371276705707, guid: 2de3d7ed8ce094e4b86597a811edf5b5, type: 3}
+      propertyPath: m_TagString
+      value: DeathlyTrap
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2302,6 +2548,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Props_2 (8)
       objectReference: {fileID: 0}
+    - target: {fileID: 5927385371276705707, guid: 2de3d7ed8ce094e4b86597a811edf5b5, type: 3}
+      propertyPath: m_TagString
+      value: DeathlyTrap
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2407,6 +2657,10 @@ PrefabInstance:
     - target: {fileID: 5927385371276705707, guid: 2de3d7ed8ce094e4b86597a811edf5b5, type: 3}
       propertyPath: m_Name
       value: Props_2 (3)
+      objectReference: {fileID: 0}
+    - target: {fileID: 5927385371276705707, guid: 2de3d7ed8ce094e4b86597a811edf5b5, type: 3}
+      propertyPath: m_TagString
+      value: DeathlyTrap
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2636,6 +2890,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Props_2 (5)
       objectReference: {fileID: 0}
+    - target: {fileID: 5927385371276705707, guid: 2de3d7ed8ce094e4b86597a811edf5b5, type: 3}
+      propertyPath: m_TagString
+      value: DeathlyTrap
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2742,6 +3000,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Props_2
       objectReference: {fileID: 0}
+    - target: {fileID: 5927385371276705707, guid: 2de3d7ed8ce094e4b86597a811edf5b5, type: 3}
+      propertyPath: m_TagString
+      value: DeathlyTrap
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2812,6 +3074,10 @@ PrefabInstance:
       propertyPath: 'm_Materials.Array.data[3]'
       value: 
       objectReference: {fileID: 2100000, guid: 64f2b6d3297eb9a40992dff657a09417, type: 2}
+    - target: {fileID: 2891417792364849616, guid: d9c63dd33821be04586de9289ce9d1b3, type: 3}
+      propertyPath: m_TagString
+      value: DeathlyTrap
+      objectReference: {fileID: 0}
     - target: {fileID: 4502365455667838843, guid: d9c63dd33821be04586de9289ce9d1b3, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
@@ -2874,6 +3140,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 8282558055256507817, guid: d9c63dd33821be04586de9289ce9d1b3, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1048099057479192910}
+    - targetCorrespondingSourceObject: {fileID: 2891417792364849616, guid: d9c63dd33821be04586de9289ce9d1b3, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6517925285198692990}
   m_SourcePrefab: {fileID: 100100000, guid: d9c63dd33821be04586de9289ce9d1b3, type: 3}
 --- !u!4 &922180623173748607 stripped
 Transform:
@@ -2919,6 +3188,32 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Rotate
   speed: 110
+--- !u!1 &4990091929507652363 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2891417792364849616, guid: d9c63dd33821be04586de9289ce9d1b3, type: 3}
+  m_PrefabInstance: {fileID: 7881368627834669787}
+  m_PrefabAsset: {fileID: 0}
+--- !u!65 &6517925285198692990
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4990091929507652363}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2.4448266, y: 0.22537549, z: 0.63699985}
+  m_Center: {x: 0.95828295, y: 0, z: -0.013039082}
 --- !u!1001 &8299171821577908349
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2979,6 +3274,10 @@ PrefabInstance:
       propertyPath: 'm_Materials.Array.data[1]'
       value: 
       objectReference: {fileID: 2100000, guid: 36365474cbb74a246af7c5ab417e6bc9, type: 2}
+    - target: {fileID: 5338071358202630470, guid: 32f8781aed4186344b891265e4f57e19, type: 3}
+      propertyPath: m_TagString
+      value: DeathlyTrap
+      objectReference: {fileID: 0}
     - target: {fileID: 8385945678036860757, guid: 32f8781aed4186344b891265e4f57e19, type: 3}
       propertyPath: m_Name
       value: Props_5 (2)
@@ -2993,6 +3292,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 8385945678036860757, guid: 32f8781aed4186344b891265e4f57e19, type: 3}
       insertIndex: -1
       addedObject: {fileID: 8235500478894152076}
+    - targetCorrespondingSourceObject: {fileID: 5338071358202630470, guid: 32f8781aed4186344b891265e4f57e19, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2984899024604625525}
   m_SourcePrefab: {fileID: 100100000, guid: 32f8781aed4186344b891265e4f57e19, type: 3}
 --- !u!1 &525876503822389032 stripped
 GameObject:
@@ -3033,6 +3335,32 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Rotate
   speed: 70
+--- !u!1 &4123106289290043707 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5338071358202630470, guid: 32f8781aed4186344b891265e4f57e19, type: 3}
+  m_PrefabInstance: {fileID: 8299171821577908349}
+  m_PrefabAsset: {fileID: 0}
+--- !u!65 &2984899024604625525
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4123106289290043707}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.7695269, y: 0.72525144, z: 4.627401}
+  m_Center: {x: -0.0000038146973, y: 0, z: 0}
 --- !u!4 &7185759566153404303 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1194692560944463858, guid: 32f8781aed4186344b891265e4f57e19, type: 3}
@@ -3089,6 +3417,10 @@ PrefabInstance:
     - target: {fileID: 5927385371276705707, guid: 2de3d7ed8ce094e4b86597a811edf5b5, type: 3}
       propertyPath: m_Name
       value: Props_2 (4)
+      objectReference: {fileID: 0}
+    - target: {fileID: 5927385371276705707, guid: 2de3d7ed8ce094e4b86597a811edf5b5, type: 3}
+      propertyPath: m_TagString
+      value: DeathlyTrap
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

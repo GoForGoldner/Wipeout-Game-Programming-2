@@ -47,9 +47,8 @@ public class MainMenuUI : MonoBehaviour
 
         if (mouseSensitivitySlider)
             mouseSensitivitySlider.SetValueWithoutNotify(data.settings.mouseSensitivity);
-
         if (sensitivityValueLabel)
-            sensitivityValueLabel.text = data.settings.mouseSensitivity.ToString("F2");
+            sensitivityValueLabel.text = $"Mouse Sensitivity: {data.settings.mouseSensitivity:F2}";
     }
 
     string FormatTime(float seconds)

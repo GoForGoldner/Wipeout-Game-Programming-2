@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -39,6 +40,9 @@ public class GameManager : NetworkBehaviour
     bool transitionStarted;
     bool localResultShown;
 
+    // HUDs subscribe to refresh on finish events.
+    readonly List<LevelHUD> huds = new List<LevelHUD>();
+
     void Awake()
     {
         Instance = this;
@@ -66,6 +70,26 @@ public class GameManager : NetworkBehaviour
         winnerClientId.OnValueChanged -= OnWinnerChanged;
         levelClosed.OnValueChanged -= OnLevelClosedChanged;
         finishOrder.OnListChanged -= OnFinishOrderChanged;
+    }
+
+    // ── HUD hooks ──────────────────────────────────────────────────────────
+
+    public void SubscribeToHUD(LevelHUD hud)
+    {
+        if (!huds.Contains(hud)) huds.Add(hud);
+    }
+
+    public void UnsubscribeFromHUD(LevelHUD hud)
+    {
+        huds.Remove(hud);
+    }
+
+    public int GetFinishCount() => finishOrder != null ? finishOrder.Count : 0;
+
+    void NotifyHUDs()
+    {
+        foreach (var hud in huds)
+            if (hud != null) hud.Refresh();
     }
 
     [ServerRpc(RequireOwnership = false)]
@@ -132,6 +156,9 @@ public class GameManager : NetworkBehaviour
 
     void OnFinishOrderChanged(NetworkListEvent<ulong> change)
     {
+        // Refresh HUD on every finish so the qualifier counter updates live.
+        NotifyHUDs();
+
         if (localResultShown) return;
 
         bool isFinal = MatchManager.Instance != null && MatchManager.Instance.IsFinalLevel;
@@ -249,8 +276,14 @@ public class GameManager : NetworkBehaviour
     {
         yield return new WaitForSeconds(transitionDelay);
 
+        // Tell every non-host client to shut down and load the start scene.
+        // Give the RPC a couple frames to actually flush over the network
+        // before we shut down, otherwise late-joining clients may miss it.
         EndMatchClientRpc(startSceneName);
         yield return null;
+        yield return null;
+
+        CleanupSingletonsBeforeShutdown();
 
         NetworkManager.Singleton.Shutdown();
         SceneManager.LoadScene(startSceneName);
@@ -260,7 +293,21 @@ public class GameManager : NetworkBehaviour
     void EndMatchClientRpc(string sceneToLoad)
     {
         if (IsServer) return;
+
+        CleanupSingletonsBeforeShutdown();
+
         NetworkManager.Singleton.Shutdown();
         SceneManager.LoadScene(sceneToLoad);
+    }
+
+    // Destroys DontDestroyOnLoad singletons so the next match starts with fresh state
+    // instead of inheriting stale level index / eliminated list / event subscriptions.
+    static void CleanupSingletonsBeforeShutdown()
+    {
+        if (MatchManager.Instance != null)
+            Destroy(MatchManager.Instance.gameObject);
+
+        if (PlayerSpawner.Instance != null)
+            Destroy(PlayerSpawner.Instance.gameObject);
     }
 }

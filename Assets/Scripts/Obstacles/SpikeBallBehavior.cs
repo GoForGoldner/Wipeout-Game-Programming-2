@@ -10,4 +10,3 @@ public class SpikeBallBehavior : MonoBehaviour
             Destroy(gameObject);
     }
 }
-

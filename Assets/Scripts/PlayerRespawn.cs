@@ -32,6 +32,7 @@ public class PlayerRespawn : MonoBehaviour
 
         StartCoroutine(RespawnRoutine());
     }
+
     Transform GetRandomSpawnPoint()
     {
         GameObject parent = GameObject.FindGameObjectWithTag(spawnPointParentTag);
@@ -44,8 +45,6 @@ public class PlayerRespawn : MonoBehaviour
         List<Transform> spawnPoints = new List<Transform>();
         foreach (Transform t in parent.transform)
             spawnPoints.Add(t);
-
-        Debug.Log("Found " + spawnPoints.Count + " spawn points");
 
         if (spawnPoints.Count == 0) return null;
 
@@ -80,8 +79,23 @@ public class PlayerRespawn : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("DeathlyTrap"))
-        {
             Die();
-        }
+    }
+
+    // For solid (non-trigger) DeathlyTrap colliders. CharacterController fires this
+    // via OnControllerColliderHit, but plain rigidbody/collider hits use OnCollisionEnter.
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.collider.CompareTag("DeathlyTrap"))
+            Die();
+    }
+
+    // CharacterController's collision callback — required because CC doesn't fire
+    // OnCollisionEnter normally. This is the path that catches solid traps the
+    // player physically walks into.
+    private void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        if (hit.collider.CompareTag("DeathlyTrap"))
+            Die();
     }
 }

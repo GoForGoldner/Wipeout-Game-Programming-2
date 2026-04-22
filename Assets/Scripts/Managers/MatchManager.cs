@@ -36,11 +36,11 @@ public class MatchManager : NetworkBehaviour
     public bool debugSoloMode = false;
     [Tooltip("Allow matches to start with 3 players. Use to test elimination (3 -> 2 -> 1).")]
     public bool debugTrioMode = false;
-    [SerializeField] int normalMinPlayers = 6;
+    [SerializeField] int normalMinPlayers = 4;
 
     [Header("Scene Flow")]
     [SerializeField] string lobbySceneName = "LobbyScene";
-    [SerializeField] List<string> gameplaySceneNames = new List<string> { "Round1", "Round1", "Round1" };
+    [SerializeField] List<string> gameplaySceneNames = new List<string> { "Round1", "Round2", "Round3" };
 
     public string LobbySceneName => lobbySceneName;
 

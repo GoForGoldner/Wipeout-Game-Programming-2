@@ -18,6 +18,8 @@ public class StartMatchUIManager : MonoBehaviour
     string clientJoinCode;
     void Start()
     {
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
         if (!NetworkManager.Singleton)
             return;
 

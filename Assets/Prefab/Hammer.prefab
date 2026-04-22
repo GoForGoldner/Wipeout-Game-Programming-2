@@ -113,6 +113,9 @@ MonoBehaviour:
   maxAngle: 60
   speed: 3
   localAxis: {x: 0, y: 0, z: 1}
+  audioSource: {fileID: 0}
+  whooshClip: {fileID: 0}
+  whooshVolume: 0.5
 --- !u!65 &6939984019199377056
 BoxCollider:
   m_ObjectHideFlags: 0

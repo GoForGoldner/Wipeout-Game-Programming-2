@@ -18,7 +18,8 @@ MonoBehaviour:
   - m_GUID: 6644b72333f993240964b95c916c4c9b
     m_Address: Level2.prefab
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - default
     FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: f6d0444706e3eef4db99511224c933cb, type: 2}

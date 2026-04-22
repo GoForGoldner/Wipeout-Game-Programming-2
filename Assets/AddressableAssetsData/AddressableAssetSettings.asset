@@ -15,7 +15,7 @@ MonoBehaviour:
   m_DefaultGroup: 0d078da1b29213446a0e9580a1275808
   m_currentHash:
     serializedVersion: 2
-    Hash: 0b66491802768c814fc3acb5b2b4857f
+    Hash: d0d4da654d0f51177661076ae95ecb85
   m_OptimizeCatalogSize: 0
   m_BuildRemoteCatalog: 0
   m_CatalogRequestsTimeout: 0
@@ -79,13 +79,13 @@ MonoBehaviour:
       - m_Id: 24bfc63dd61a71e489b198f131f146a7
         m_Value: production
       - m_Id: 5e34a7c013d653e4fa1c64339db615a5
-        m_Value: CCDBuildData/acd422e0-7128-4cc6-a8ba-9347b5b55604/665abc39-3fc2-484f-a6ae-9bc9530eec6a/latest
+        m_Value: '[UnityEngine.AddressableAssets.Addressables.BuildPath]/[BuildTarget]'
       - m_Id: 799ae73c2851d8943b8b831dbdf075b2
-        m_Value: CCDBuildData/acd422e0-7128-4cc6-a8ba-9347b5b55604/665abc39-3fc2-484f-a6ae-9bc9530eec6a/latest
+        m_Value: CCDBuildData/ManagedEnvironment/ManagedBucket/ManagedBadge
       - m_Id: 7a89c46afca84c840aae54cdd58850e7
-        m_Value: https://cfc9816e-0d40-4a06-953b-d55a13cf8f8e.client-api.unity3dusercontent.com/client_api/v1/environments/production/buckets/665abc39-3fc2-484f-a6ae-9bc9530eec6a/release_by_badge/latest/entry_by_path/content/?path=
+        m_Value: '{UnityEngine.AddressableAssets.Addressables.RuntimePath}/[BuildTarget]'
       - m_Id: 90b078cc7a35c9544954cf8410434558
-        m_Value: https://cfc9816e-0d40-4a06-953b-d55a13cf8f8e.client-api.unity3dusercontent.com/client_api/v1/environments/production/buckets/665abc39-3fc2-484f-a6ae-9bc9530eec6a/release_by_badge/latest/entry_by_path/content/?path=
+        m_Value: https://cfc9816e-0d40-4a06-953b-d55a13cf8f8e.client-api.unity3dusercontent.com/client_api/v1/environments/{CcdManager.EnvironmentName}/buckets/{CcdManager.BucketId}/release_by_badge/{CcdManager.Badge}/entry_by_path/content/?path=
     m_ProfileEntryNames:
     - m_Id: 1a3fd189f67aafa4fbc40f2c4a74a4d8
       m_Name: BuildTarget

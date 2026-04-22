@@ -5,9 +5,6 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 0
-    path: Assets/Scenes/Level1.unity
-    guid: 388b5136a6e71224f9f5347168b8e2b0
   - enabled: 1
     path: Assets/Scenes/GameScenes/HostClientScene.unity
     guid: c705be31b49af6e479d8c1cd810d6b54
@@ -15,20 +12,14 @@ EditorBuildSettings:
     path: Assets/Scenes/GameScenes/LobbyScene.unity
     guid: 32c22a28195ff4d4aa37ff5cfee725c7
   - enabled: 1
+    path: Assets/Scenes/GameScenes/Round1.unity
+    guid: 63d4de6bb3f55094084efbc03f2dae0a
+  - enabled: 1
     path: Assets/Scenes/GameScenes/Round2.unity
     guid: 8e8dfa32bc251a74d8127e4ba132d8cc
-  - enabled: 0
-    path: Assets/Scenes/a.unity
-    guid: e1a385c697988634ca126eef5c50c55b
-  - enabled: 0
-    path: Assets/Scenes/Level2.unity
-    guid: 86430a5ebaf286a4a9d1918a80126c5b
   - enabled: 1
     path: Assets/Scenes/GameScenes/Round3.unity
     guid: 23026c3dc9454f641b633273e77ba551
-  - enabled: 1
-    path: Assets/Scenes/GameScenes/Round1.unity
-    guid: 63d4de6bb3f55094084efbc03f2dae0a
   m_configObjects:
     com.unity.addressableassets: {fileID: 11400000, guid: fe1e52fe4e31cac4aa37956fa2fde6f5, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}

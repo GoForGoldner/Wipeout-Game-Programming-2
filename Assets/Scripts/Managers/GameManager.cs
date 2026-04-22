@@ -40,7 +40,6 @@ public class GameManager : NetworkBehaviour
     bool transitionStarted;
     bool localResultShown;
 
-    // HUDs subscribe to refresh on finish events.
     readonly List<LevelHUD> huds = new List<LevelHUD>();
 
     void Awake()
@@ -71,8 +70,6 @@ public class GameManager : NetworkBehaviour
         levelClosed.OnValueChanged -= OnLevelClosedChanged;
         finishOrder.OnListChanged -= OnFinishOrderChanged;
     }
-
-    // ── HUD hooks ──────────────────────────────────────────────────────────
 
     public void SubscribeToHUD(LevelHUD hud)
     {
@@ -156,7 +153,6 @@ public class GameManager : NetworkBehaviour
 
     void OnFinishOrderChanged(NetworkListEvent<ulong> change)
     {
-        // Refresh HUD on every finish so the qualifier counter updates live.
         NotifyHUDs();
 
         if (localResultShown) return;
@@ -276,9 +272,6 @@ public class GameManager : NetworkBehaviour
     {
         yield return new WaitForSeconds(transitionDelay);
 
-        // Tell every non-host client to shut down and load the start scene.
-        // Give the RPC a couple frames to actually flush over the network
-        // before we shut down, otherwise late-joining clients may miss it.
         EndMatchClientRpc(startSceneName);
         yield return null;
         yield return null;
@@ -300,8 +293,6 @@ public class GameManager : NetworkBehaviour
         SceneManager.LoadScene(sceneToLoad);
     }
 
-    // Destroys DontDestroyOnLoad singletons so the next match starts with fresh state
-    // instead of inheriting stale level index / eliminated list / event subscriptions.
     static void CleanupSingletonsBeforeShutdown()
     {
         if (MatchManager.Instance != null)

@@ -1,10 +1,5 @@
 using UnityEngine;
 
-/// <summary>
-/// Smart version of SpinningHazard. Watches for nearby players and adjusts
-/// behavior across three states: Idle (slow), Alerted (faster), Aggressive
-/// (fastest + targets the player's side of the path).
-/// </summary>
 [RequireComponent(typeof(Collider))]
 public class SmartSpinningHazard : MonoBehaviour
 {
@@ -41,17 +36,14 @@ public class SmartSpinningHazard : MonoBehaviour
 
     void Update()
     {
-        // ── AI scan ──
         if (Time.time >= nextScanTime)
         {
             nextScanTime = Time.time + scanInterval;
             UpdateAIState();
         }
 
-        // ── Rotation ──
         transform.Rotate(baseRotationSpeed * currentMultiplier * Time.deltaTime, 0f, 0f, Space.Self);
 
-        // ── Translation ──
         pingPongTime += Time.deltaTime * baseMoveSpeed * currentMultiplier;
 
         float t = currentTargetT >= 0f
@@ -91,7 +83,7 @@ public class SmartSpinningHazard : MonoBehaviour
         {
             currentState = State.Idle;
             currentMultiplier = 1f;
-            currentTargetT = -1f; // resume normal ping-pong
+            currentTargetT = -1f;
         }
         else if (nearestDist > aggressiveRange)
         {
@@ -104,8 +96,6 @@ public class SmartSpinningHazard : MonoBehaviour
             currentState = State.Aggressive;
             currentMultiplier = aggressiveMultiplier;
 
-            // Target the player's z position along the hazard's path.
-            // Convert the player's world position into the same local space as startPosition.
             Vector3 playerLocal = transform.parent != null
                 ? transform.parent.InverseTransformPoint(nearestPlayer.position)
                 : nearestPlayer.position;
@@ -113,7 +103,6 @@ public class SmartSpinningHazard : MonoBehaviour
             float playerZOffset = playerLocal.z - startPosition.z;
             float targetT = Mathf.InverseLerp(zMin, zMax, playerZOffset);
 
-            // Blend between current ping-pong and player target.
             float pingPongT = Mathf.PingPong(pingPongTime, 1f);
             currentTargetT = Mathf.Lerp(pingPongT, targetT, aggressivePathBias);
         }

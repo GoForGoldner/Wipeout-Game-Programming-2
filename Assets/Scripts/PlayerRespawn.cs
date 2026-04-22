@@ -22,7 +22,6 @@ public class PlayerRespawn : MonoBehaviour
     {
         if (isRespawning) return;
 
-        // Eliminated players shouldn't respawn - they're just spectating.
         var netObj = GetComponent<Unity.Netcode.NetworkObject>();
         if (netObj != null && MatchManager.Instance != null
             && MatchManager.Instance.IsEliminated(netObj.OwnerClientId))
@@ -82,17 +81,12 @@ public class PlayerRespawn : MonoBehaviour
             Die();
     }
 
-    // For solid (non-trigger) DeathlyTrap colliders. CharacterController fires this
-    // via OnControllerColliderHit, but plain rigidbody/collider hits use OnCollisionEnter.
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.collider.CompareTag("DeathlyTrap"))
             Die();
     }
 
-    // CharacterController's collision callback — required because CC doesn't fire
-    // OnCollisionEnter normally. This is the path that catches solid traps the
-    // player physically walks into.
     private void OnControllerColliderHit(ControllerColliderHit hit)
     {
         if (hit.collider.CompareTag("DeathlyTrap"))

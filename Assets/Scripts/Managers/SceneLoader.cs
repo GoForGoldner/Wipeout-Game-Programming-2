@@ -8,7 +8,6 @@ public class SceneLoader : MonoBehaviour
 
     void Awake()
     {
-        // Keep exactly one instance across all scenes
         if (Instance != null && Instance != this)
         {
             Destroy(gameObject);

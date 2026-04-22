@@ -2,11 +2,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-/// <summary>
-/// Displays persistent stats + mouse sensitivity on the start scene.
-/// Coexists with StartMatchUIManager (which owns Host/Client buttons).
-/// Uses Observer pattern via PlayerProgressManager.OnProgressUpdated.
-/// </summary>
 public class MainMenuUI : MonoBehaviour
 {
     [Header("Stats Display")]
@@ -64,8 +59,6 @@ public class MainMenuUI : MonoBehaviour
         int s = (int)(seconds % 60);
         return h > 0 ? $"{h:D2}:{m:D2}:{s:D2}" : $"{m:D2}:{s:D2}";
     }
-
-    // ---------- Button handlers (wire in Inspector) ----------
 
     public void OnResetProgressClicked()
     {

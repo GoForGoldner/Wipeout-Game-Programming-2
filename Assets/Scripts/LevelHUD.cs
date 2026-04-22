@@ -9,8 +9,8 @@ public class LevelHUD : MonoBehaviour
     public GameManager gameManager;
 
     [Header("UI Text")]
-    public TMP_Text levelText;       // "Level 1 / 3"
-    public TMP_Text qualifierText;   // "Qualified: 2/4"
+    public TMP_Text levelText;
+    public TMP_Text qualifierText;
 
     void Start()
     {
@@ -44,7 +44,6 @@ public class LevelHUD : MonoBehaviour
 
         if (qualifierText)
         {
-            // On the final level, frame it as "First to finish wins!"
             if (MatchManager.Instance.IsFinalLevel)
                 qualifierText.text = "First to finish wins!";
             else

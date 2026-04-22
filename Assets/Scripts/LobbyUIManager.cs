@@ -5,9 +5,9 @@ using UnityEngine.UI;
 
 public class LobbyUIManager : MonoBehaviour
 {
+    public GameObject lobbyUiRoot;
     public GameObject startMatchButton;
     public GameObject waitMatchText;
-    public string gameplaySceneName;
     public TMP_Text lobbyCodeTxt;
 
     Button startButton;
@@ -41,25 +41,64 @@ public class LobbyUIManager : MonoBehaviour
             return;
         }
 
-        matchManager.StartMatch();
-        SceneLoader.LoadNetworked(gameplaySceneName);
+        matchManager.BeginPerkSelection();
     }
 
     void OnStateChanged(MatchState oldState, MatchState newState)
     {
-        if (newState != MatchState.Lobby) return;
+        if (newState == MatchState.Lobby)
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
 
-        if (NetworkManager.Singleton.IsHost)
-        {
-            startMatchButton.SetActive(true);
-            waitMatchText.SetActive(false);
-            if (lobbyCodeTxt)
-                lobbyCodeTxt.text = matchManager.LobbyCode;
+            if (lobbyUiRoot != null)
+                lobbyUiRoot.SetActive(true);
+
+            if (NetworkManager.Singleton.IsHost)
+            {
+                startMatchButton.SetActive(true);
+                waitMatchText.SetActive(false);
+
+                if (lobbyCodeTxt)
+                    lobbyCodeTxt.text = matchManager.LobbyCode;
+            }
+            else
+            {
+                waitMatchText.SetActive(true);
+                startMatchButton.SetActive(false);
+            }
+
+            return;
         }
-        else
+
+        if (newState == MatchState.PerkSelection)
         {
-            waitMatchText.SetActive(true);
-            startMatchButton.SetActive(false);
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+
+            if (lobbyUiRoot != null)
+                lobbyUiRoot.SetActive(false);
+
+            return;
+        }
+
+        if (newState == MatchState.Playing)
+        {
+            if (lobbyUiRoot != null)
+                lobbyUiRoot.SetActive(false);
+
+            if (NetworkManager.Singleton.IsHost)
+            {
+                string sceneToLoad = matchManager.GetCurrentGameplaySceneName();
+                if (!string.IsNullOrEmpty(sceneToLoad))
+                {
+                    SceneLoader.LoadNetworked(sceneToLoad);
+                }
+                else
+                {
+                    Debug.LogError("LobbyUIManager: no gameplay scene found for current level index.");
+                }
+            }
         }
     }
 

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Unity.Netcode;
 
 public class PerkLoadoutUI : MonoBehaviour
 {
@@ -37,6 +38,67 @@ public class PerkLoadoutUI : MonoBehaviour
         {
             PerkInventory.Instance.OnSelectedPerkChanged += HandleSelectedPerkChanged;
         }
+
+        if (MatchManager.Instance != null)
+        {
+            MatchManager.Instance.State.OnValueChanged += OnMatchStateChanged;
+            OnMatchStateChanged(MatchManager.Instance.State.Value, MatchManager.Instance.State.Value);
+        }
+    }
+
+    private void UnlockCursorForUi()
+    {
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+    }
+
+    private void LockCursorForGameplay()
+    {
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+    }
+
+    private void OnMatchStateChanged(MatchState oldState, MatchState newState)
+    {
+        if (newState == MatchState.PerkSelection)
+        {
+            ulong localId = NetworkManager.Singleton != null ? NetworkManager.Singleton.LocalClientId : ulong.MaxValue;
+
+            // After Round 1 has started, eliminated players should not see or use perk selection.
+            if (MatchManager.Instance != null &&
+                MatchManager.Instance.PlayersInLevel.Value > 0 &&
+                MatchManager.Instance.IsEliminated(localId))
+            {
+                HidePanel();
+                return;
+            }
+
+            UnlockCursorForUi();
+
+            if (confirmButton != null)
+                confirmButton.interactable = PerkInventory.Instance != null && PerkInventory.Instance.HasSelection();
+
+            // Restore previous selection if one exists for this client
+            if (MatchManager.Instance != null && PerkInventory.Instance != null)
+            {
+                int perkIndex = MatchManager.Instance.GetLocalPerkIndex();
+                if (perkIndex >= 0 && perkIndex < PerkInventory.Instance.AvailablePerks.Count)
+                {
+                    PerkInventory.Instance.SelectPerk((PerkData)PerkInventory.Instance.AvailablePerks[perkIndex]);
+                }
+            }
+
+            ShowPanel();
+        }
+        else
+        {
+            HidePanel();
+
+            if (newState == MatchState.Playing)
+            {
+                LockCursorForGameplay();
+            }
+        }
     }
 
     private void OnDestroy()
@@ -44,6 +106,11 @@ public class PerkLoadoutUI : MonoBehaviour
         if (PerkInventory.Instance != null)
         {
             PerkInventory.Instance.OnSelectedPerkChanged -= HandleSelectedPerkChanged;
+        }
+
+        if (MatchManager.Instance != null)
+        {
+            MatchManager.Instance.State.OnValueChanged -= OnMatchStateChanged;
         }
     }
 
@@ -152,9 +219,38 @@ public class PerkLoadoutUI : MonoBehaviour
         }
     }
 
+    private int GetSelectedPerkIndex()
+    {
+        if (PerkInventory.Instance == null || currentlySelectedPerk == null)
+            return -1;
+
+        var perks = PerkInventory.Instance.AvailablePerks;
+        for (int i = 0; i < perks.Count; i++)
+        {
+            if (perks[i] == currentlySelectedPerk)
+                return i;
+        }
+
+        return -1;
+    }
+
     private void ConfirmSelection()
     {
-        Debug.Log("Perk confirmed: " + (currentlySelectedPerk != null ? currentlySelectedPerk.perkName : "None"));
+        int selectedIndex = GetSelectedPerkIndex();
+        if (selectedIndex < 0)
+            return;
+
+        Debug.Log("Perk confirmed: " + currentlySelectedPerk.perkName);
+
+        if (MatchManager.Instance != null &&
+            NetworkManager.Singleton != null &&
+            NetworkManager.Singleton.IsListening)
+        {
+            MatchManager.Instance.SubmitPerkSelectionServerRpc(selectedIndex);
+        }
+
+        if (confirmButton != null)
+            confirmButton.interactable = false;
 
         if (panelRoot != null)
             panelRoot.SetActive(false);

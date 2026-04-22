@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 
-public enum MatchState { Lobby, Playing, Countdown, Finished, Joinning }
+public enum MatchState { Lobby, PerkSelection, Playing, Countdown, Finished, Joinning }
 
 public class MatchManager : NetworkBehaviour
 {
@@ -18,13 +18,12 @@ public class MatchManager : NetworkBehaviour
         NetworkVariableReadPermission.Everyone,
         NetworkVariableWritePermission.Server);
 
-    // Number of players still "alive" (not eliminated) at the start of the current level.
-    // Used to compute qualifier counts.
+    public NetworkList<PlayerPerkSelection> PerkSelections;
+
     public NetworkVariable<int> PlayersInLevel = new NetworkVariable<int>(0,
         NetworkVariableReadPermission.Everyone,
         NetworkVariableWritePermission.Server);
 
-    // 0 = Level 1, 1 = Level 2, 2 = Level 3 (final)
     public NetworkVariable<int> CurrentLevelIndex = new NetworkVariable<int>(0,
         NetworkVariableReadPermission.Everyone,
         NetworkVariableWritePermission.Server);
@@ -38,6 +37,21 @@ public class MatchManager : NetworkBehaviour
     [Tooltip("Allow matches to start with 3 players. Use to test elimination (3 -> 2 -> 1).")]
     public bool debugTrioMode = false;
     [SerializeField] int normalMinPlayers = 6;
+
+    [Header("Scene Flow")]
+    [SerializeField] string lobbySceneName = "LobbyScene";
+    [SerializeField] List<string> gameplaySceneNames = new List<string> { "Round1", "Round1", "Round1" };
+
+    public string LobbySceneName => lobbySceneName;
+
+    public string GetCurrentGameplaySceneName()
+    {
+        if (gameplaySceneNames == null || gameplaySceneNames.Count == 0)
+            return string.Empty;
+
+        int index = Mathf.Clamp(CurrentLevelIndex.Value, 0, gameplaySceneNames.Count - 1);
+        return gameplaySceneNames[index];
+    }
 
     public int MinPlayersToStart
     {
@@ -54,12 +68,7 @@ public class MatchManager : NetworkBehaviour
     public string LobbyCode => lobbyCode;
     string lobbyCode;
 
-    // Server-only set of eliminated clientIds. Persists across level scenes because
-    // MatchManager is DontDestroyOnLoad. Clients query via IsEliminated NetworkBehaviour RPC-style method below.
     readonly HashSet<ulong> eliminated = new HashSet<ulong>();
-
-    // Synced version of the eliminated set (NetworkList only holds the ids).
-    // Kept in sync with `eliminated` by the server. Clients read this.
     NetworkList<ulong> eliminatedSync;
 
     void Awake()
@@ -74,15 +83,18 @@ public class MatchManager : NetworkBehaviour
         DontDestroyOnLoad(gameObject);
 
         eliminatedSync = new NetworkList<ulong>();
+        PerkSelections = new NetworkList<PlayerPerkSelection>();
     }
 
     public override void OnNetworkSpawn()
     {
         if (!IsServer) return;
+
         NetworkManager.Singleton.OnClientConnectedCallback += OnClientChanged;
         NetworkManager.Singleton.OnClientDisconnectCallback += OnClientChanged;
 
         UpdatePlayerCount();
+        RebuildPerkSelections();
     }
 
     public override void OnNetworkDespawn()
@@ -96,11 +108,16 @@ public class MatchManager : NetworkBehaviour
         }
     }
 
-    void OnClientChanged(ulong _) => UpdatePlayerCount();
+    void OnClientChanged(ulong _)
+    {
+        UpdatePlayerCount();
+        RebuildPerkSelections();
+    }
 
     void Update()
     {
         if (!IsServer || NetworkManager.Singleton == null) return;
+
         int actual = NetworkManager.Singleton.ConnectedClientsIds.Count;
         if (PlayerCount.Value != actual)
             PlayerCount.Value = actual;
@@ -108,21 +125,159 @@ public class MatchManager : NetworkBehaviour
 
     void UpdatePlayerCount()
     {
-        if (!IsServer) return;
+        if (!IsServer || NetworkManager.Singleton == null) return;
         PlayerCount.Value = NetworkManager.Singleton.ConnectedClientsIds.Count;
+    }
+
+    int GetExpectedPerkChooserCount()
+    {
+        if (PlayersInLevel.Value > 0)
+            return PlayersInLevel.Value;
+
+        return NetworkManager.Singleton != null
+            ? NetworkManager.Singleton.ConnectedClientsIds.Count
+            : 0;
+    }
+
+    void RebuildPerkSelections()
+    {
+        if (!IsServer || NetworkManager.Singleton == null) return;
+
+        var oldSelections = new Dictionary<ulong, PlayerPerkSelection>();
+        foreach (var entry in PerkSelections)
+        {
+            oldSelections[entry.clientId] = entry;
+        }
+
+        PerkSelections.Clear();
+
+        foreach (ulong clientId in NetworkManager.Singleton.ConnectedClientsIds)
+        {
+            // After Round 1 starts, only survivors should participate in later perk picks.
+            if (PlayersInLevel.Value > 0 && IsEliminated(clientId))
+                continue;
+
+            if (oldSelections.TryGetValue(clientId, out var oldEntry))
+            {
+                PerkSelections.Add(new PlayerPerkSelection(clientId, oldEntry.perkIndex, false));
+            }
+            else
+            {
+                PerkSelections.Add(new PlayerPerkSelection(clientId, -1, false));
+            }
+        }
+    }
+
+    void UpdatePerkSelection(ulong clientId, int perkIndex, bool isReady)
+    {
+        if (!IsServer) return;
+
+        for (int i = 0; i < PerkSelections.Count; i++)
+        {
+            if (PerkSelections[i].clientId == clientId)
+            {
+                PerkSelections[i] = new PlayerPerkSelection(clientId, perkIndex, isReady);
+                return;
+            }
+        }
+
+        PerkSelections.Add(new PlayerPerkSelection(clientId, perkIndex, isReady));
+    }
+
+    bool AreAllPlayersReadyForPerks()
+    {
+        if (!IsServer || NetworkManager.Singleton == null) return false;
+        if (PerkSelections.Count == 0) return false;
+
+        int expectedCount = GetExpectedPerkChooserCount();
+        if (PerkSelections.Count != expectedCount) return false;
+
+        foreach (var entry in PerkSelections)
+        {
+            if (!entry.isReady || entry.perkIndex < 0)
+                return false;
+        }
+
+        return true;
+    }
+
+    public void BeginPerkSelection()
+    {
+        if (!IsServer) return;
+
+        RebuildPerkSelections();
+        State.Value = MatchState.PerkSelection;
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void SubmitPerkSelectionServerRpc(int perkIndex, ServerRpcParams rpcParams = default)
+    {
+        if (!IsServer) return;
+
+        ulong senderId = rpcParams.Receive.SenderClientId;
+
+        // After Round 1 has begun, eliminated players are not allowed to pick perks anymore.
+        if (PlayersInLevel.Value > 0 && IsEliminated(senderId))
+        {
+            Debug.Log($"Ignoring perk selection from eliminated client {senderId}.");
+            return;
+        }
+
+        UpdatePerkSelection(senderId, perkIndex, true);
+
+        if (AreAllPlayersReadyForPerks())
+        {
+            if (PlayersInLevel.Value <= 0)
+                StartInitialMatch();
+            else
+                StartCurrentRound();
+        }
+    }
+
+    public int GetLocalPerkIndex()
+    {
+        if (NetworkManager.Singleton == null) return -1;
+
+        ulong localId = NetworkManager.Singleton.LocalClientId;
+        foreach (var entry in PerkSelections)
+        {
+            if (entry.clientId == localId)
+                return entry.perkIndex;
+        }
+
+        return -1;
     }
 
     // ────────────────────────────── Match flow ──────────────────────────────
 
-    public void StartMatch()
+    public void StartInitialMatch()
     {
         if (!IsServer) return;
-        State.Value = MatchState.Playing;
+
         CurrentLevelIndex.Value = 0;
         PlayersInLevel.Value = PlayerCount.Value;
 
         eliminated.Clear();
         eliminatedSync.Clear();
+
+        State.Value = MatchState.Playing;
+    }
+
+    public void StartCurrentRound()
+    {
+        if (!IsServer) return;
+        State.Value = MatchState.Playing;
+    }
+
+    public void BeginNextRoundPerkSelection(int survivingPlayers)
+    {
+        if (!IsServer) return;
+
+        CurrentLevelIndex.Value++;
+        PlayersInLevel.Value = survivingPlayers;
+
+        RebuildPerkSelections();
+        State.Value = MatchState.PerkSelection;
     }
 
     public void AdvanceLevel(int newPlayersInLevel)
@@ -164,7 +319,6 @@ public class MatchManager : NetworkBehaviour
 
     public bool IsEliminated(ulong clientId)
     {
-        // Server has the authoritative set; clients check via the synced list.
         if (IsServer) return eliminated.Contains(clientId);
 
         for (int i = 0; i < eliminatedSync.Count; i++)
@@ -172,15 +326,13 @@ public class MatchManager : NetworkBehaviour
         return false;
     }
 
-    /// <summary>
-    /// How many players should qualify to advance from the current level.
-    /// Final level always keeps 1. Earlier levels keep ceil(PlayersInLevel * 2/3), min 1.
-    /// </summary>
     public int GetQualifierCount()
     {
         if (IsFinalLevel) return 1;
+
         int n = PlayersInLevel.Value;
         if (n <= 1) return 1;
+
         return Mathf.Max(1, Mathf.CeilToInt(n * 2f / 3f));
     }
 }

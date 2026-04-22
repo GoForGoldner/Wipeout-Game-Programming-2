@@ -9,10 +9,10 @@ public class GameManager : NetworkBehaviour
 
     [Header("UI")]
     public GameObject resultPanel;
-    public GameObject qualifiedText;   // "Qualified!"
-    public GameObject eliminatedText;  // "Eliminated - Spectating"
-    public GameObject winText;         // "You Win!" (final level)
-    public GameObject loseText;        // "You Lose"  (final level)
+    public GameObject qualifiedText;
+    public GameObject eliminatedText;
+    public GameObject winText;
+    public GameObject loseText;
 
     [Header("Cameras")]
     [Tooltip("Overhead spectator camera for this level. Enabled for eliminated clients.")]
@@ -28,14 +28,11 @@ public class GameManager : NetworkBehaviour
     [Tooltip("Seconds to show the result panel before transitioning.")]
     public float transitionDelay = 4f;
 
-    // Ordered list of clientIds that have finished THIS level.
     NetworkList<ulong> finishOrder;
 
-    // Set to true by the server when the qualifier quota is reached.
     NetworkVariable<bool> levelClosed = new NetworkVariable<bool>(false,
         NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
-    // Final-level winner (only used when IsFinalLevel).
     NetworkVariable<ulong> winnerClientId = new NetworkVariable<ulong>(
         ulong.MaxValue, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
@@ -57,8 +54,6 @@ public class GameManager : NetworkBehaviour
         levelClosed.OnValueChanged += OnLevelClosedChanged;
         finishOrder.OnListChanged += OnFinishOrderChanged;
 
-        // If this client is already eliminated (carried over from a previous level),
-        // activate spectator mode immediately on scene load.
         if (MatchManager.Instance != null &&
             MatchManager.Instance.IsEliminated(NetworkManager.Singleton.LocalClientId))
         {
@@ -73,8 +68,6 @@ public class GameManager : NetworkBehaviour
         finishOrder.OnListChanged -= OnFinishOrderChanged;
     }
 
-    // ─────────────────────────── Finish handling ───────────────────────────
-
     [ServerRpc(RequireOwnership = false)]
     public void ReportFinishServerRpc(ServerRpcParams rpcParams = default)
     {
@@ -82,11 +75,9 @@ public class GameManager : NetworkBehaviour
 
         ulong senderId = rpcParams.Receive.SenderClientId;
 
-        // Eliminated players shouldn't be able to finish.
         if (MatchManager.Instance != null && MatchManager.Instance.IsEliminated(senderId))
             return;
 
-        // Ignore duplicate finishes.
         for (int i = 0; i < finishOrder.Count; i++)
             if (finishOrder[i] == senderId) return;
 
@@ -96,7 +87,6 @@ public class GameManager : NetworkBehaviour
 
         if (isFinal)
         {
-            // First finisher wins the match.
             if (winnerClientId.Value == ulong.MaxValue)
             {
                 winnerClientId.Value = senderId;
@@ -119,14 +109,19 @@ public class GameManager : NetworkBehaviour
     {
         if (!IsServer || levelClosed.Value) return;
 
-        // Mark everyone who DIDN'T finish as eliminated.
         foreach (var clientId in NetworkManager.Singleton.ConnectedClientsIds)
         {
-            if (MatchManager.Instance.IsEliminated(clientId)) continue; // already out
+            if (MatchManager.Instance.IsEliminated(clientId)) continue;
 
             bool finished = false;
             for (int i = 0; i < finishOrder.Count; i++)
-                if (finishOrder[i] == clientId) { finished = true; break; }
+            {
+                if (finishOrder[i] == clientId)
+                {
+                    finished = true;
+                    break;
+                }
+            }
 
             if (!finished)
                 MatchManager.Instance.MarkEliminated(clientId);
@@ -135,12 +130,8 @@ public class GameManager : NetworkBehaviour
         levelClosed.Value = true;
     }
 
-    // ────────────────────────────── UI flow ──────────────────────────────
-
     void OnFinishOrderChanged(NetworkListEvent<ulong> change)
     {
-        // Show "Qualified!" to this client the instant they cross the line
-        // (non-final levels only; final-level winner gets a different banner).
         if (localResultShown) return;
 
         bool isFinal = MatchManager.Instance != null && MatchManager.Instance.IsFinalLevel;
@@ -163,14 +154,12 @@ public class GameManager : NetworkBehaviour
 
         bool isFinal = MatchManager.Instance != null && MatchManager.Instance.IsFinalLevel;
 
-        // If I never finished and level just closed, I'm eliminated.
         if (!isFinal && !localResultShown)
         {
             ShowResult(qualified: false, isFinalLevel: false);
             EnterSpectatorMode();
         }
 
-        // Server drives the transition timer.
         if (IsServer && !transitionStarted)
         {
             transitionStarted = true;
@@ -209,7 +198,6 @@ public class GameManager : NetworkBehaviour
             if (loseText) loseText.SetActive(false);
         }
 
-        // Single-level win counter: +1 whenever you qualify (including final-level winner).
         if (qualified && PlayerProgressManager.Instance != null)
         {
             PlayerProgressManager.Instance.AddWin();
@@ -227,43 +215,43 @@ public class GameManager : NetworkBehaviour
             if (controller) controller.enabled = false;
         }
 
-        // Disable ALL orbit cameras in the scene (the one rigged to the local player).
-        // The spectator camera has higher depth so it renders on top anyway, but this
-        // prevents dual AudioListener warnings and stops mouse-look input consumption.
         foreach (var orbit in FindObjectsByType<OrbitCamera>(FindObjectsSortMode.None))
         {
             if (orbit.cam) orbit.cam.gameObject.SetActive(false);
         }
     }
 
-    // ────────────────────────── Server transitions ──────────────────────────
-
     IEnumerator ServerAdvanceAfterDelay()
     {
         yield return new WaitForSeconds(transitionDelay);
 
-        if (string.IsNullOrEmpty(nextSceneName))
+        int survivors = finishOrder.Count;
+
+        if (MatchManager.Instance == null)
         {
-            Debug.LogWarning("GameManager: nextSceneName is empty but level is not final. Ending match.");
-            yield return ServerEndMatchAfterDelay();
+            Debug.LogError("GameManager: MatchManager.Instance is null.");
             yield break;
         }
 
-        int survivors = finishOrder.Count; // those who qualified this level
-        MatchManager.Instance.AdvanceLevel(survivors);
+        MatchManager.Instance.BeginNextRoundPerkSelection(survivors);
 
-        NetworkManager.Singleton.SceneManager.LoadScene(nextSceneName, LoadSceneMode.Single);
+        string lobbyScene = MatchManager.Instance.LobbySceneName;
+        if (string.IsNullOrEmpty(lobbyScene))
+        {
+            Debug.LogError("GameManager: Lobby scene name is empty.");
+            yield break;
+        }
+
+        NetworkManager.Singleton.SceneManager.LoadScene(lobbyScene, LoadSceneMode.Single);
     }
 
     IEnumerator ServerEndMatchAfterDelay()
     {
         yield return new WaitForSeconds(transitionDelay);
 
-        // Tell every non-host client to shut down and load the start scene.
         EndMatchClientRpc(startSceneName);
         yield return null;
 
-        // Host shuts down last.
         NetworkManager.Singleton.Shutdown();
         SceneManager.LoadScene(startSceneName);
     }
@@ -271,7 +259,7 @@ public class GameManager : NetworkBehaviour
     [ClientRpc]
     void EndMatchClientRpc(string sceneToLoad)
     {
-        if (IsServer) return; // host handles its own shutdown above
+        if (IsServer) return;
         NetworkManager.Singleton.Shutdown();
         SceneManager.LoadScene(sceneToLoad);
     }
